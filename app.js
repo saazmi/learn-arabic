@@ -130,6 +130,30 @@
     { id: "stories", label: "Stories", icon: "ق" },
   ];
 
+  // ---- thème (clair / sombre) --------------------------------------------
+  // Sans préférence enregistrée : on suit l'OS (media query).
+  // Avec préférence : attribut data-theme sur <html> qui gagne sur la MQ.
+  const THEME_KEY = "learnArabic.theme";
+  const SUN_SVG  = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>';
+  const MOON_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>';
+  function loadTheme() { try { return localStorage.getItem(THEME_KEY) || ""; } catch (_) { return ""; } }
+  function saveTheme(v) { try { if (v) localStorage.setItem(THEME_KEY, v); else localStorage.removeItem(THEME_KEY); } catch (_) {} }
+  function currentTheme() {
+    const stored = loadTheme();
+    if (stored === "light" || stored === "dark") return stored;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
+  function applyTheme(v) {
+    if (v === "light" || v === "dark") document.documentElement.setAttribute("data-theme", v);
+    else document.documentElement.removeAttribute("data-theme");
+  }
+  function toggleTheme() {
+    const next = currentTheme() === "dark" ? "light" : "dark";
+    saveTheme(next);
+    applyTheme(next);
+    return next;
+  }
+
   function shell(active, mainHTML) {
     let items = "";
     NAV.forEach(function (it) {
@@ -138,12 +162,19 @@
                  '<span class="nav-lbl">' + it.label + "</span>" +
                "</button>";
     });
+    const isDark = currentTheme() === "dark";
+    const themeBtn = '<button class="theme-toggle" id="theme-toggle" ' +
+                       'title="' + (isDark ? "Light theme" : "Dark theme") + '" ' +
+                       'aria-label="' + (isDark ? "Switch to light theme" : "Switch to dark theme") + '">' +
+                       (isDark ? SUN_SVG : MOON_SVG) +
+                     "</button>";
     h(
       '<div class="shell">' +
         '<nav class="rail">' +
           '<div class="brand"><div class="bismillah" dir="rtl">بِسْمِ اللَّه</div>' +
             '<div class="brand-t">Learn<br>Arabic</div></div>' +
           '<div class="nav-items">' + items + "</div>" +
+          '<div class="rail-foot">' + themeBtn + "</div>" +
         "</nav>" +
         '<main class="main"><div class="screen" data-view="' + active + '">' + mainHTML + "</div></main>" +
       "</div>"
@@ -151,6 +182,8 @@
     Array.prototype.forEach.call(document.querySelectorAll(".nav-item"), function (b) {
       b.onclick = function () { go(b.getAttribute("data-nav")); };
     });
+    const tt = document.getElementById("theme-toggle");
+    if (tt) tt.onclick = function () { toggleTheme(); go(active); };
   }
 
   function focus(mainHTML, backLabel, onBack) {
@@ -638,6 +671,7 @@
   //  Le service-worker précédent laissait les appareils bloqués sur du JS
   //  périmé — celui-ci se désenregistre à l'ouverture puis disparaît.
   state = Object.assign({ scores: {} }, localLoad());
+  applyTheme(loadTheme());       // restore saved light/dark override (if any)
   screenHome();
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", function () {
