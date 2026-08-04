@@ -275,30 +275,21 @@
       '<div class="study">' +
         '<div class="phase-label">Leçon ' + lesson.n + " · Apprentissage · " + (i + 1) + "/" + total + "</div>" +
         '<div class="progress"><span style="width:' + pct + '%"></span></div>' +
-        '<div class="card concept" id="card">' +
+        '<div class="card concept">' +
           '<div class="concept-front" dir="ltr">' + bidi(annotate(card.front)) + "</div>" +
-          '<div class="reveal-hint" id="hint">touche pour voir l\'exemple</div>' +
-          '<div class="concept-back" id="cardback" hidden>' +
+          '<div class="concept-back">' +
             '<div class="example-word" dir="ltr">' + bidi(annotate(card.example)).replace(/\s*·\s*/g, "<br>") + "</div>" +
             '<div class="example-explain" dir="ltr">' + bidi(annotate(card.explain)) + "</div>" +
           "</div>" +
         "</div>" +
         '<div class="nav-row">' +
           (i > 0 ? '<button class="btn btn-ghost" id="prev">‹ Précédent</button>' : '<span class="spacer"></span>') +
-          '<button class="btn btn-primary" id="next" hidden>' + (last ? "Passer au quiz →" : "Suivant →") + "</button>" +
+          '<button class="btn btn-primary" id="next">' + (last ? "Passer au quiz →" : "Suivant →") + "</button>" +
         "</div>" +
       "</div>",
       "Grammaire", screenGrammar
     );
 
-    let revealed = false;
-    function reveal() {
-      if (revealed) return; revealed = true;
-      document.getElementById("cardback").hidden = false;
-      document.getElementById("hint").style.visibility = "hidden";
-      document.getElementById("next").hidden = false;
-    }
-    document.getElementById("card").onclick = reveal;
     if (i > 0) document.getElementById("prev").onclick = function () { teach(lesson, i - 1); };
     document.getElementById("next").onclick = function () {
       if (last) { setPos("g", lesson.id, total); startLessonQuiz(lesson); }

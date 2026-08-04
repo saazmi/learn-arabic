@@ -1455,3 +1455,36 @@ bdi { font-family: var(--arabic); font-style: normal; }
 
 /* Widen the home page so half-cards + tiles can share the same row on iPad landscape */
 .main .screen[data-view="home"] { max-width: 1200px; }
+
+
+/* =========================================================================
+   Dark theme — auto via prefers-color-scheme.
+   Aged tobacco brown surfaces + brighter burnt gold accent for contrast.
+   Same palette family (warm parchment) — just inverted.
+   ========================================================================= */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:        #221d15;   /* tobacco brown */
+    --bg-2:      #17130d;
+    --surface:   #2f2820;
+    --surface-2: #3a3128;
+    --ink:       #eee5d0;   /* aged cream text */
+    --ink-soft:  #a0937a;
+    --emerald:   #d29a41;   /* bright burnt gold */
+    --emerald-d: #a17020;
+    --gold:      #e7c979;
+    --good:      #8bb168;
+    --again:     #c47458;
+    --shadow:    0 8px 26px rgba(0, 0, 0, 0.45);
+  }
+
+  /* Overlays that were hardcoded in the light theme — invert to dark tints. */
+  .rail { background: rgba(23, 19, 13, 0.75); border-right-color: rgba(255, 245, 220, 0.10); }
+  .verse-panel, .analyse-panel { background: rgba(60, 50, 35, 0.55); }
+  .row-main:hover { background: rgba(255, 245, 220, 0.06); }
+  .row-main:active { background: rgba(255, 245, 220, 0.10); }
+}
+
+/* Manual theme toggle is coming in Phase 3 alongside the FR/EN language
+   switch — one control that also flips light/dark. For now the OS
+   preference above is the source of truth. */
