@@ -1,0 +1,18 @@
+{
+  "name": "Learn Arabic",
+  "short_name": "Arabic",
+  "description": "Learn Arabic with flashcards — grammar, vocabulary and Qur'anic stories.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#ece7dd",
+  "theme_color": "#a06a1f",
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "./apple-touch-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
