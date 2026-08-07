@@ -34,27 +34,30 @@
   //   fr/en   : gloses des deux langues
   //   pl      : forme plurielle réelle et vérifiée
   //   plType  : "broken" (jamʿ taksīr) | "sound-f" (retire ة + ات)
+  // g  = genre grammatical ARABE (pilote تاء مربوطة, هٰذَا/هٰذِهِ, accord adj.)
+  // fg = genre grammatical FRANÇAIS (pilote le/la, un/une côté français)
+  //      — ils DIVERGENT parfois (عَيْن ar. f / « un œil » fr. m ; شَجَرَة ar. f / « un arbre » fr. m).
   const NOUNS = [
-    { ar: "كِتَاب",    fr: "livre",     en: "book",      g: "m", pl: "كُتُب",       plType: "broken" },
-    { ar: "رَجُل",     fr: "homme",     en: "man",       g: "m", pl: "رِجَال",      plType: "broken" },
-    { ar: "بَيْت",     fr: "maison",    en: "house",     g: "m", pl: "بُيُوت",      plType: "broken" },
-    { ar: "قَمَر",     fr: "lune",      en: "moon",      g: "m", pl: "أَقْمَار",    plType: "broken" },
-    { ar: "قَلَم",     fr: "stylo",     en: "pen",       g: "m", pl: "أَقْلَام",    plType: "broken" },
-    { ar: "بَاب",      fr: "porte",     en: "door",      g: "m", pl: "أَبْوَاب",    plType: "broken" },
-    { ar: "وَلَد",     fr: "garçon",    en: "boy",       g: "m", pl: "أَوْلَاد",    plType: "broken" },
-    { ar: "نُور",      fr: "lumière",   en: "light",     g: "m", pl: "أَنْوَار",    plType: "broken" },
-    { ar: "قَلْب",     fr: "cœur",      en: "heart",     g: "m", pl: "قُلُوب",      plType: "broken" },
-    { ar: "نَجْم",     fr: "étoile",    en: "star",      g: "m", pl: "نُجُوم",      plType: "broken" },
-    { ar: "رَسُول",    fr: "messager",  en: "messenger", g: "m", pl: "رُسُل",       plType: "broken" },
-    { ar: "مَدْرَسَة", fr: "école",     en: "school",    g: "f", pl: "مَدَارِس",    plType: "broken" },
-    { ar: "شَجَرَة",   fr: "arbre",     en: "tree",      g: "f", pl: "أَشْجَار",    plType: "broken" },
-    { ar: "سَيَّارَة", fr: "voiture",   en: "car",       g: "f", pl: "سَيَّارَات",  plType: "sound-f" },
-    { ar: "مُعَلِّمَة", fr: "enseignante", en: "teacher (f.)", g: "f", pl: "مُعَلِّمَات", plType: "sound-f" },
-    { ar: "شَمْس",     fr: "soleil",    en: "sun",       g: "f", pl: "شُمُوس",      plType: "broken" },
-    { ar: "أَرْض",     fr: "terre",     en: "earth",     g: "f", pl: "أَرَاضٍ",     plType: "broken" },
-    { ar: "يَد",       fr: "main",      en: "hand",      g: "f", pl: "أَيْدٍ",      plType: "broken" },
-    { ar: "نَفْس",     fr: "âme",       en: "soul",      g: "f", pl: "أَنْفُس",     plType: "broken" },
-    { ar: "عَيْن",     fr: "œil",       en: "eye",       g: "f", pl: "أَعْيُن",     plType: "broken" },
+    { ar: "كِتَاب",    fr: "livre",     en: "book",      g: "m", fg: "m", pl: "كُتُب",       plType: "broken" },
+    { ar: "رَجُل",     fr: "homme",     en: "man",       g: "m", fg: "m", pl: "رِجَال",      plType: "broken" },
+    { ar: "بَيْت",     fr: "maison",    en: "house",     g: "m", fg: "f", pl: "بُيُوت",      plType: "broken" },
+    { ar: "قَمَر",     fr: "lune",      en: "moon",      g: "m", fg: "f", pl: "أَقْمَار",    plType: "broken" },
+    { ar: "قَلَم",     fr: "stylo",     en: "pen",       g: "m", fg: "m", pl: "أَقْلَام",    plType: "broken" },
+    { ar: "بَاب",      fr: "porte",     en: "door",      g: "m", fg: "f", pl: "أَبْوَاب",    plType: "broken" },
+    { ar: "وَلَد",     fr: "garçon",    en: "boy",       g: "m", fg: "m", pl: "أَوْلَاد",    plType: "broken" },
+    { ar: "نُور",      fr: "lumière",   en: "light",     g: "m", fg: "f", pl: "أَنْوَار",    plType: "broken" },
+    { ar: "قَلْب",     fr: "cœur",      en: "heart",     g: "m", fg: "m", pl: "قُلُوب",      plType: "broken" },
+    { ar: "نَجْم",     fr: "étoile",    en: "star",      g: "m", fg: "f", pl: "نُجُوم",      plType: "broken" },
+    { ar: "رَسُول",    fr: "messager",  en: "messenger", g: "m", fg: "m", pl: "رُسُل",       plType: "broken" },
+    { ar: "مَدْرَسَة", fr: "école",     en: "school",    g: "f", fg: "f", pl: "مَدَارِس",    plType: "broken" },
+    { ar: "شَجَرَة",   fr: "arbre",     en: "tree",      g: "f", fg: "m", pl: "أَشْجَار",    plType: "broken" },
+    { ar: "سَيَّارَة", fr: "voiture",   en: "car",       g: "f", fg: "f", pl: "سَيَّارَات",  plType: "sound-f" },
+    { ar: "مُعَلِّمَة", fr: "enseignante", en: "teacher (f.)", g: "f", fg: "f", pl: "مُعَلِّمَات", plType: "sound-f" },
+    { ar: "شَمْس",     fr: "soleil",    en: "sun",       g: "f", fg: "m", pl: "شُمُوس",      plType: "broken" },
+    { ar: "أَرْض",     fr: "terre",     en: "earth",     g: "f", fg: "f", pl: "أَرَاضٍ",     plType: "broken" },
+    { ar: "يَد",       fr: "main",      en: "hand",      g: "f", fg: "f", pl: "أَيْدٍ",      plType: "broken" },
+    { ar: "نَفْس",     fr: "âme",       en: "soul",      g: "f", fg: "f", pl: "أَنْفُس",     plType: "broken" },
+    { ar: "عَيْن",     fr: "œil",       en: "eye",       g: "f", fg: "m", pl: "أَعْيُن",     plType: "broken" },
   ];
   const VERBS = [
     { ar: "خَلَقَ",  fr: "il a créé",       en: "he created" },
@@ -131,13 +134,23 @@
   function soundFPlural(w) { return w.ar.replace(/ة$/, "") + "ات"; }
   function soundMPlural(w) { return w.ar.replace(/ة$/, "") + "ون"; }
 
+  // ---- Articles français (basés sur fg + élision devant voyelle) ---------
+  // NB : le genre français fg peut différer du genre arabe g (voir NOUNS).
+  //      « h » est traité comme voyelle (h muet — vrai pour tous les mots du pool).
+  function startsVowel(fr) { return /^[haeiouyàâéèêîïôöûüùœéèë]/i.test(fr); }
+  function frLe(w)   { return startsVowel(w.fr) ? "l'" + w.fr : (w.fg === "f" ? "la " + w.fr : "le " + w.fr); }
+  function frUn(w)   { return (w.fg === "f" ? "une " : "un ") + w.fr; }
+  function frDe(w)   { return startsVowel(w.fr) ? "de l'" + w.fr : (w.fg === "f" ? "de la " + w.fr : "du " + w.fr); }
+  // « mon / ma / mes » : mon devant voyelle (ou h muet) même au féminin.
+  function frMon(w)  { return startsVowel(w.fr) ? "mon " + w.fr : (w.fg === "f" ? "ma " + w.fr : "mon " + w.fr); }
+
   // =========================================================================
   //  GABARITS DE GRAMMAIRE — chacun tagué par leçon(s)
   //  make() renvoie une question { q, options, answer, explain } bilingue.
   // =========================================================================
   const T = {
     type: {
-      lessons: ["g1"],
+      lessons: ["g1"], maxPerQuiz: 3,
       make: function () {
         const bag = NOUNS.map(w => ({ w: w, t: 0 }))
           .concat(VERBS.map(w => ({ w: w, t: 1 })))
@@ -195,7 +208,7 @@
     },
 
     solar: {
-      lessons: ["g1"],
+      lessons: ["g1"], maxPerQuiz: 2,
       make: function () {
         const w = rand(NOUNS);
         const solar = isSolar(w);
@@ -218,9 +231,8 @@
       lessons: ["g2"], maxPerQuiz: 1,
       make: function () {
         const w = rand(NOUNS);
-        const article = w.g === "f" ? "une " : "un ";
         return {
-          q: L("Pour dire « ceci est " + article + w.fr + " », en arabe on…",
+          q: L("Pour dire « c'est " + frUn(w) + " », en arabe on…",
                "To say 'this is a " + w.en + "', in Arabic you…"),
           options: [L("accole les deux mots (pas de verbe « être »)",
                       "just put the two words side by side (no verb 'to be')"),
@@ -234,7 +246,7 @@
     },
 
     demon: {
-      lessons: ["g2"],
+      lessons: ["g2"], maxPerQuiz: 2,
       make: function () {
         const w = rand(NOUNS);
         const explFr = endsTaa(w)
@@ -259,7 +271,7 @@
       make: function () {
         const a = rand(NOUNS);
         return {
-          q: L("Dans une إضافة (ex. « le " + a.fr + " de … »), le 1er mot (مُضَاف)…",
+          q: L("Dans une إضافة (ex. « " + frLe(a) + " de … »), le 1er mot (مُضَاف)…",
                "In an iḍāfa (e.g. 'the " + a.en + " of …'), the 1st word (muḍāf)…"),
           options: [L("ne prend ni الـ ni tanwin", "takes neither الـ nor tanwīn"),
                     L("prend toujours الـ",       "always takes الـ"),
@@ -272,7 +284,7 @@
     },
 
     gender: {
-      lessons: ["g3"],
+      lessons: ["g3"], maxPerQuiz: 2,
       make: function () {
         const w = rand(NOUNS);
         const explFr = endsTaa(w)
@@ -295,7 +307,7 @@
     },
 
     plural_m: {
-      lessons: ["g3"],
+      lessons: ["g3"], maxPerQuiz: 2,
       make: function () {
         const w = rand(PLURAL_M);
         return {
@@ -310,7 +322,7 @@
     },
 
     plural_of: {
-      lessons: ["g3"],
+      lessons: ["g3"], maxPerQuiz: 3,
       make: function () {
         const w = rand(NOUNS.filter(function (x) { return x.pl; }));
         const sf = soundFPlural(w);
@@ -341,11 +353,11 @@
     },
 
     suffix_my: {
-      lessons: ["g4"],
+      lessons: ["g4"], maxPerQuiz: 2,
       make: function () {
         const w = rand(NOUNS.filter(x => !endsTaa(x)));
         return {
-          q: L("Comment dire « mon " + w.fr + " » ?",
+          q: L("Comment dire « " + frMon(w) + " » ?",
                "How do you say 'my " + w.en + "'?"),
           options: [L(w.ar + "ِي", w.ar + "ِي"),
                     L(w.ar + "ُكَ", w.ar + "ُكَ"),
@@ -423,25 +435,8 @@
       },
     },
 
-    verb_to_be: {
-      lessons: ["g2"], maxPerQuiz: 1,
-      make: function () {
-        const w = rand(NOUNS);
-        return {
-          q: L("Au présent, pour dire « " + w.ar + " est [X] » en arabe, on…",
-               "In the present, to say '" + w.ar + " is [X]' in Arabic, you…"),
-          options: [L("accole les deux mots — pas de verbe « être »", "just put the two words side by side — no verb 'to be'"),
-                    L("place le verbe كَانَ entre eux", "put the verb كَانَ between them"),
-                    L("place هُوَ / هِيَ entre eux comme un « être »", "put هُوَ / هِيَ between them as a copula")],
-          answer: 0,
-          explain: L("La phrase nominale n'a pas de verbe « être » au présent : مبتدأ + خبر suffit.",
-                     "The nominal sentence has no verb 'to be' in the present: mubtadaʾ + khabar is enough."),
-        };
-      },
-    },
-
     question_word: {
-      lessons: ["g2"],
+      lessons: ["g2"], maxPerQuiz: 2,
       make: function () {
         const isPerson = Math.random() < 0.5;
         const noun = isPerson
@@ -467,7 +462,7 @@
     },
 
     dual_form: {
-      lessons: ["g3"],
+      lessons: ["g3"], maxPerQuiz: 2,
       make: function () {
         // Duel au cas sujet : + ـَان (masc) / ـة → ـتَان (fém).
         const w = rand(NOUNS);
@@ -521,7 +516,7 @@
     },
 
     pronoun_isolated: {
-      lessons: ["g4"],
+      lessons: ["g4"], maxPerQuiz: 3,
       make: function () {
         const p = rand(ISOLATED_PRONOUNS);
         const distract = sample(ISOLATED_PRONOUNS.filter(x => x.ar !== p.ar), 3);
@@ -538,7 +533,7 @@
     },
 
     suffix_person: {
-      lessons: ["g4"],
+      lessons: ["g4"], maxPerQuiz: 3,
       make: function () {
         const p = rand(ATTACHED_PRONOUNS);
         const distract = sample(ATTACHED_PRONOUNS.filter(x => x.suf !== p.suf), 3);
@@ -558,7 +553,7 @@
     },
 
     idafa_muda_af: {
-      lessons: ["g2"],
+      lessons: ["g2"], maxPerQuiz: 2,
       make: function () {
         // On construit une إضافة « X du Y » ; on demande d'identifier le مضاف.
         const a = rand(NOUNS);
@@ -567,9 +562,8 @@
         // Guillemets « » autour de la phrase arabe : isole la séquence RTL du
         // mot « إضافة » qui précède, sinon les deux runs arabes se recollent
         // et l'ordre visuel du groupe devient trompeur.
-        const artB = b.g === "f" ? "de la" : "du";
         return {
-          q: L("Dans l'إضافة suivante — « " + phrase + " » (« le " + a.fr + " " + artB + " " + b.fr + " ») — lequel est le مُضَاف ?",
+          q: L("Dans l'إضافة suivante — « " + phrase + " » (« " + frLe(a) + " " + frDe(b) + " ») — lequel est le مُضَاف ?",
                "In the following iḍāfa — '" + phrase + "' ('the " + a.en + " of the " + b.en + "') — which is the muḍāf?"),
           options: [L(a.ar + " (1er mot)", a.ar + " (1st word)"),
                     L(b.ar + " (2e mot)",  b.ar + " (2nd word)"),
