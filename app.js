@@ -147,7 +147,8 @@
   function currentLang() {
     const stored = loadLang();
     if (stored === "fr" || stored === "en") return stored;
-    return (navigator.language || "en").toLowerCase().indexOf("fr") === 0 ? "fr" : "en";
+    // French is the default; students explicitly opt into English via the toggle.
+    return "fr";
   }
   // Substitute {0}, {1}, ... and the plural marker {p} (empty in FR, "ies" in EN).
   function t(key) {
