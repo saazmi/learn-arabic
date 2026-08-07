@@ -564,9 +564,13 @@
         const a = rand(NOUNS);
         const b = rand(NOUNS.filter(x => x.ar !== a.ar));
         const phrase = a.ar + "ُ " + "ال" + b.ar.replace(/^ال/, "") + "ِ";
+        // Guillemets « » autour de la phrase arabe : isole la séquence RTL du
+        // mot « إضافة » qui précède, sinon les deux runs arabes se recollent
+        // et l'ordre visuel du groupe devient trompeur.
+        const artB = b.g === "f" ? "de la" : "du";
         return {
-          q: L("Dans l'إضافة " + phrase + " (« le " + a.fr + " du/de la " + b.fr + " »), lequel est le مُضَاف ?",
-               "In the iḍāfa " + phrase + " ('the " + a.en + " of the " + b.en + "'), which is the muḍāf?"),
+          q: L("Dans l'إضافة suivante — « " + phrase + " » (« le " + a.fr + " " + artB + " " + b.fr + " ») — lequel est le مُضَاف ?",
+               "In the following iḍāfa — '" + phrase + "' ('the " + a.en + " of the " + b.en + "') — which is the muḍāf?"),
           options: [L(a.ar + " (1er mot)", a.ar + " (1st word)"),
                     L(b.ar + " (2e mot)",  b.ar + " (2nd word)"),
                     L("les deux",         "both")],
