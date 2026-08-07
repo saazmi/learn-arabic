@@ -35,50 +35,91 @@
   //   pl      : forme plurielle réelle et vérifiée
   //   plType  : "broken" (jamʿ taksīr) | "sound-f" (retire ة + ات)
   const NOUNS = [
-    { ar: "كِتَاب",    fr: "livre",   en: "book",   g: "m", pl: "كُتُب",       plType: "broken" },
-    { ar: "رَجُل",     fr: "homme",   en: "man",    g: "m", pl: "رِجَال",      plType: "broken" },
-    { ar: "بَيْت",     fr: "maison",  en: "house",  g: "m", pl: "بُيُوت",      plType: "broken" },
-    { ar: "قَمَر",     fr: "lune",    en: "moon",   g: "m", pl: "أَقْمَار",    plType: "broken" },
-    { ar: "قَلَم",     fr: "stylo",   en: "pen",    g: "m", pl: "أَقْلَام",    plType: "broken" },
-    { ar: "بَاب",      fr: "porte",   en: "door",   g: "m", pl: "أَبْوَاب",    plType: "broken" },
-    { ar: "وَلَد",     fr: "garçon",  en: "boy",    g: "m", pl: "أَوْلَاد",    plType: "broken" },
-    { ar: "مَدْرَسَة", fr: "école",   en: "school", g: "f", pl: "مَدَارِس",    plType: "broken" },
-    { ar: "شَجَرَة",   fr: "arbre",   en: "tree",   g: "f", pl: "أَشْجَار",    plType: "broken" },
-    { ar: "سَيَّارَة", fr: "voiture", en: "car",    g: "f", pl: "سَيَّارَات",  plType: "sound-f" },
-    { ar: "شَمْس",     fr: "soleil",  en: "sun",    g: "f", pl: "شُمُوس",      plType: "broken" },
-    { ar: "أَرْض",     fr: "terre",   en: "earth",  g: "f", pl: "أَرَاضٍ",     plType: "broken" },
-    { ar: "يَد",       fr: "main",    en: "hand",   g: "f", pl: "أَيْدٍ",      plType: "broken" },
+    { ar: "كِتَاب",    fr: "livre",     en: "book",      g: "m", pl: "كُتُب",       plType: "broken" },
+    { ar: "رَجُل",     fr: "homme",     en: "man",       g: "m", pl: "رِجَال",      plType: "broken" },
+    { ar: "بَيْت",     fr: "maison",    en: "house",     g: "m", pl: "بُيُوت",      plType: "broken" },
+    { ar: "قَمَر",     fr: "lune",      en: "moon",      g: "m", pl: "أَقْمَار",    plType: "broken" },
+    { ar: "قَلَم",     fr: "stylo",     en: "pen",       g: "m", pl: "أَقْلَام",    plType: "broken" },
+    { ar: "بَاب",      fr: "porte",     en: "door",      g: "m", pl: "أَبْوَاب",    plType: "broken" },
+    { ar: "وَلَد",     fr: "garçon",    en: "boy",       g: "m", pl: "أَوْلَاد",    plType: "broken" },
+    { ar: "نُور",      fr: "lumière",   en: "light",     g: "m", pl: "أَنْوَار",    plType: "broken" },
+    { ar: "قَلْب",     fr: "cœur",      en: "heart",     g: "m", pl: "قُلُوب",      plType: "broken" },
+    { ar: "نَجْم",     fr: "étoile",    en: "star",      g: "m", pl: "نُجُوم",      plType: "broken" },
+    { ar: "رَسُول",    fr: "messager",  en: "messenger", g: "m", pl: "رُسُل",       plType: "broken" },
+    { ar: "مَدْرَسَة", fr: "école",     en: "school",    g: "f", pl: "مَدَارِس",    plType: "broken" },
+    { ar: "شَجَرَة",   fr: "arbre",     en: "tree",      g: "f", pl: "أَشْجَار",    plType: "broken" },
+    { ar: "سَيَّارَة", fr: "voiture",   en: "car",       g: "f", pl: "سَيَّارَات",  plType: "sound-f" },
+    { ar: "مُعَلِّمَة", fr: "enseignante", en: "teacher (f.)", g: "f", pl: "مُعَلِّمَات", plType: "sound-f" },
+    { ar: "شَمْس",     fr: "soleil",    en: "sun",       g: "f", pl: "شُمُوس",      plType: "broken" },
+    { ar: "أَرْض",     fr: "terre",     en: "earth",     g: "f", pl: "أَرَاضٍ",     plType: "broken" },
+    { ar: "يَد",       fr: "main",      en: "hand",      g: "f", pl: "أَيْدٍ",      plType: "broken" },
+    { ar: "نَفْس",     fr: "âme",       en: "soul",      g: "f", pl: "أَنْفُس",     plType: "broken" },
+    { ar: "عَيْن",     fr: "œil",       en: "eye",       g: "f", pl: "أَعْيُن",     plType: "broken" },
   ];
   const VERBS = [
-    { ar: "خَلَقَ", fr: "il a créé",     en: "he created" },
-    { ar: "قَالَ", fr: "il a dit",       en: "he said" },
-    { ar: "ذَهَبَ", fr: "il est allé",   en: "he went" },
-    { ar: "عَلِمَ", fr: "il a su",       en: "he knew" },
-    { ar: "كَتَبَ", fr: "il a écrit",    en: "he wrote" },
-    { ar: "سَمِعَ", fr: "il a entendu",  en: "he heard" },
-    { ar: "نَصَرَ", fr: "il a secouru",  en: "he helped" },
+    { ar: "خَلَقَ",  fr: "il a créé",       en: "he created" },
+    { ar: "قَالَ",  fr: "il a dit",         en: "he said" },
+    { ar: "ذَهَبَ",  fr: "il est allé",     en: "he went" },
+    { ar: "عَلِمَ",  fr: "il a su",         en: "he knew" },
+    { ar: "كَتَبَ",  fr: "il a écrit",      en: "he wrote" },
+    { ar: "سَمِعَ",  fr: "il a entendu",    en: "he heard" },
+    { ar: "نَصَرَ",  fr: "il a secouru",    en: "he helped" },
+    { ar: "رَأَى",   fr: "il a vu",         en: "he saw" },
+    { ar: "أَكَلَ",  fr: "il a mangé",      en: "he ate" },
+    { ar: "شَرِبَ",  fr: "il a bu",         en: "he drank" },
+    { ar: "فَتَحَ",  fr: "il a ouvert",     en: "he opened" },
   ];
   const PARTICLES = [
-    { ar: "فِي",   fr: "dans",         en: "in" },
-    { ar: "مِنْ",  fr: "de, depuis",   en: "from" },
-    { ar: "إِلَى", fr: "vers",         en: "toward" },
-    { ar: "عَلَى", fr: "sur",          en: "on, upon" },
-    { ar: "وَ",    fr: "et",           en: "and" },
-    { ar: "هَلْ",  fr: "est-ce que",   en: "(question particle)" },
+    { ar: "فِي",   fr: "dans",           en: "in" },
+    { ar: "مِنْ",  fr: "de, depuis",     en: "from" },
+    { ar: "إِلَى", fr: "vers",           en: "toward" },
+    { ar: "عَلَى", fr: "sur",            en: "on, upon" },
+    { ar: "وَ",    fr: "et",             en: "and" },
+    { ar: "هَلْ",  fr: "est-ce que",     en: "(question particle)" },
+    { ar: "بِ",    fr: "par, avec",      en: "with, by" },
+    { ar: "لِـ",   fr: "à, pour",        en: "to, for" },
+    { ar: "عَنْ",  fr: "au sujet de",    en: "about, from" },
   ];
   const PLURAL_M = [
-    { ar: "مُسْلِم", fr: "musulman",   en: "Muslim" },
-    { ar: "مُؤْمِن", fr: "croyant",    en: "believer" },
-    { ar: "طَالِب",  fr: "étudiant",   en: "student" },
-    { ar: "كَافِر",  fr: "mécréant",   en: "disbeliever" },
+    { ar: "مُسْلِم",  fr: "musulman",   en: "Muslim" },
+    { ar: "مُؤْمِن",  fr: "croyant",    en: "believer" },
+    { ar: "طَالِب",   fr: "étudiant",   en: "student" },
+    { ar: "كَافِر",   fr: "mécréant",   en: "disbeliever" },
+    { ar: "مُعَلِّم", fr: "enseignant", en: "teacher" },
+    { ar: "صَادِق",   fr: "véridique",  en: "truthful (person)" },
   ];
   // pluriels de choses (non-humains) — pour la règle d'accord au féminin singulier
   const NONHUMAN = [
-    { pl: "كُتُب",    fr: "livres",  en: "books" },
-    { pl: "بُيُوت",   fr: "maisons", en: "houses" },
-    { pl: "أَقْلَام", fr: "stylos",  en: "pens" },
-    { pl: "أَيَّام",  fr: "jours",   en: "days" },
-    { pl: "أَبْوَاب", fr: "portes",  en: "doors" },
+    { pl: "كُتُب",    fr: "livres",   en: "books" },
+    { pl: "بُيُوت",   fr: "maisons",  en: "houses" },
+    { pl: "أَقْلَام", fr: "stylos",   en: "pens" },
+    { pl: "أَيَّام",  fr: "jours",    en: "days" },
+    { pl: "أَبْوَاب", fr: "portes",   en: "doors" },
+    { pl: "أَشْجَار", fr: "arbres",   en: "trees" },
+    { pl: "قُلُوب",   fr: "cœurs",    en: "hearts" },
+    { pl: "آيَات",    fr: "versets",  en: "verses" },
+  ];
+  // pronoms isolés (leçon 4) — pour la question sur qui/quoi
+  const ISOLATED_PRONOUNS = [
+    { ar: "أَنَا",   fr: "je",         en: "I" },
+    { ar: "أَنْتَ",  fr: "tu (m.)",    en: "you (m.)" },
+    { ar: "أَنْتِ",  fr: "tu (f.)",    en: "you (f.)" },
+    { ar: "هُوَ",    fr: "il",         en: "he" },
+    { ar: "هِيَ",    fr: "elle",       en: "she" },
+    { ar: "نَحْنُ",  fr: "nous",       en: "we" },
+    { ar: "أَنْتُمْ", fr: "vous (m.)", en: "you (pl. m.)" },
+    { ar: "هُمْ",    fr: "ils",        en: "they (m.)" },
+  ];
+  // pronoms suffixes (leçon 4)
+  const ATTACHED_PRONOUNS = [
+    { suf: "ي",   fr: "mon / ma",     en: "my" },
+    { suf: "كَ",  fr: "ton / ta (m.)", en: "your (m.)" },
+    { suf: "كِ",  fr: "ton / ta (f.)", en: "your (f.)" },
+    { suf: "هُ",  fr: "son / sa (m.)", en: "his" },
+    { suf: "هَا", fr: "son / sa (f.)", en: "her" },
+    { suf: "نَا", fr: "notre",         en: "our" },
+    { suf: "كُمْ", fr: "votre",        en: "your (pl.)" },
+    { suf: "هُمْ", fr: "leur (m.)",    en: "their (m.)" },
   ];
 
   // lettres solaires (le ل de الـ ne se prononce pas)
@@ -381,6 +422,200 @@
         };
       },
     },
+
+    // ---- NOUVEAUX GABARITS (enrichissement) ------------------------------
+    tanwin_case: {
+      lessons: ["g1"],
+      make: function () {
+        const w = rand(NOUNS.filter(x => !endsTaa(x)));
+        const cases = [
+          { sign: "ـٌ", name: "رَفْع", nameEn: "rafʿ", role: "sujet",  roleEn: "subject" },
+          { sign: "ـً", name: "نَصْب", nameEn: "naṣb", role: "objet",  roleEn: "object" },
+          { sign: "ـٍ", name: "جَرّ",  nameEn: "jarr", role: "après prép. / إضافة", roleEn: "after prep. / iḍāfa" },
+        ];
+        const c = rand(cases);
+        return {
+          q: L("Sur " + w.ar + " (" + w.fr + ") on lit un tanwin " + c.sign + ". Quel cas ?",
+               "On " + w.ar + " (" + w.en + ") you see the tanwīn " + c.sign + ". Which case?"),
+          options: [L(c.name + " — " + c.role,       c.nameEn + " — " + c.roleEn),
+                    L(cases[(cases.indexOf(c)+1)%3].name, cases[(cases.indexOf(c)+1)%3].nameEn),
+                    L(cases[(cases.indexOf(c)+2)%3].name, cases[(cases.indexOf(c)+2)%3].nameEn)],
+          answer: 0,
+          explain: L(c.sign + " (damma / fatha / kasra doublées) marque " + c.name + " — " + c.role + ".",
+                     c.sign + " (doubled ḍamma / fatḥa / kasra) marks " + c.nameEn + " — " + c.roleEn + "."),
+        };
+      },
+    },
+
+    chadda_role: {
+      lessons: ["g1"],
+      make: function () {
+        return {
+          q: L("Que fait la chadda (le signe ـّ) sur une lettre ?",
+               "What does the shadda (the sign ـّ) do on a letter?"),
+          options: [L("elle double la lettre", "it doubles the letter"),
+                    L("elle allonge la voyelle", "it lengthens the vowel"),
+                    L("elle indique le pluriel", "it marks the plural")],
+          answer: 0,
+          explain: L("La chadda double la consonne (ex. الشَّمْس = ash-shams : le ل de الـ absorbé, chadda sur ش).",
+                     "The shadda doubles the consonant (e.g. الشَّمْس = ash-shams: the ل of الـ absorbed, shadda on ش)."),
+        };
+      },
+    },
+
+    verb_to_be: {
+      lessons: ["g2"],
+      make: function () {
+        const w = rand(NOUNS);
+        return {
+          q: L("Au présent, pour dire « " + w.ar + " est [X] » en arabe, on…",
+               "In the present, to say '" + w.ar + " is [X]' in Arabic, you…"),
+          options: [L("accole les deux mots — pas de verbe « être »", "just put the two words side by side — no verb 'to be'"),
+                    L("place le verbe كَانَ entre eux", "put the verb كَانَ between them"),
+                    L("place هُوَ / هِيَ entre eux comme un « être »", "put هُوَ / هِيَ between them as a copula")],
+          answer: 0,
+          explain: L("La phrase nominale n'a pas de verbe « être » au présent : مبتدأ + خبر suffit.",
+                     "The nominal sentence has no verb 'to be' in the present: mubtadaʾ + khabar is enough."),
+        };
+      },
+    },
+
+    question_word: {
+      lessons: ["g2"],
+      make: function () {
+        const isPerson = Math.random() < 0.5;
+        const noun = isPerson
+          ? rand([{ ar: "أَبٌ", fr: "père", en: "father" },
+                  { ar: "أُمٌّ", fr: "mère", en: "mother" },
+                  { ar: "رَجُلٌ", fr: "homme", en: "man" }])
+          : rand(NOUNS.filter(x => x.g === "m"));
+        return {
+          q: L("Pour demander « qu'est-ce que c'est ? / qui est-ce ? » à propos de " + noun.ar +
+                 " (" + (noun.fr) + "), on utilise…",
+               "To ask 'what/who is this?' about " + noun.ar + " (" + (noun.en || noun.fr) + "), you use…"),
+          options: [L(isPerson ? "مَنْ (« qui »)" : "مَا (« qu'est-ce que »)",
+                      isPerson ? "مَنْ ('who')"    : "مَا ('what')"),
+                    L(isPerson ? "مَا (« qu'est-ce que »)" : "مَنْ (« qui »)",
+                      isPerson ? "مَا ('what')"            : "مَنْ ('who')")],
+          answer: 0,
+          explain: L(isPerson ? "Une personne → مَنْ. Une chose → مَا."
+                              : "Une chose → مَا. Une personne → مَنْ.",
+                     isPerson ? "A person → مَنْ. A thing → مَا."
+                              : "A thing → مَا. A person → مَنْ."),
+        };
+      },
+    },
+
+    dual_form: {
+      lessons: ["g3"],
+      make: function () {
+        // Duel au cas sujet : + ـَان (masc) / ـة → ـتَان (fém).
+        const w = rand(NOUNS);
+        const dual = endsTaa(w)
+          ? w.ar.replace(/ة$/, "تَان")
+          : w.ar + "َان";
+        const distractPl = w.pl || (endsTaa(w) ? soundFPlural(w) : w.ar + "ُون");
+        const distractDualNasb = endsTaa(w)
+          ? w.ar.replace(/ة$/, "تَيْن")
+          : w.ar + "َيْن";
+        const opts = [L(dual, dual)];
+        if (distractDualNasb !== dual) opts.push(L(distractDualNasb + " (نصب/جرّ)", distractDualNasb + " (naṣb/jarr)"));
+        if (distractPl !== dual && distractPl !== distractDualNasb) opts.push(L(distractPl + " (pluriel)", distractPl + " (plural)"));
+        return {
+          q: L("Quel est le duel (au cas sujet) de " + w.ar + " (" + w.fr + ") ?",
+               "What is the dual (subject case) of " + w.ar + " (" + w.en + ")?"),
+          options: opts,
+          answer: 0,
+          explain: L(
+            endsTaa(w)
+              ? "Duel féminin : ة → ت + ـَان → " + dual + ". Aux autres cas : ـتَيْن."
+              : "Duel : ajoute ـَان au singulier → " + dual + ". Aux autres cas : ـَيْن.",
+            endsTaa(w)
+              ? "Feminine dual: ة → ت + ـَان → " + dual + ". In other cases: ـتَيْن."
+              : "Dual: add ـَان to the singular → " + dual + ". In other cases: ـَيْن."
+          ),
+        };
+      },
+    },
+
+    iraab_case_id: {
+      lessons: ["g3"],
+      make: function () {
+        const cases = [
+          { name: "رَفْع", nameEn: "rafʿ", vowel: "damma (ـُ)",  role: "sujet", roleEn: "subject" },
+          { name: "نَصْب", nameEn: "naṣb", vowel: "fatha (ـَ)",   role: "objet direct", roleEn: "direct object" },
+          { name: "جَرّ",  nameEn: "jarr", vowel: "kasra (ـِ)",   role: "après une préposition ou dans une إضافة", roleEn: "after a preposition or in an iḍāfa" },
+        ];
+        const c = rand(cases);
+        return {
+          q: L("Le cas " + c.name + " est marqué (au singulier défini) par quelle voyelle finale ?",
+               "The case " + c.nameEn + " is marked (on definite singulars) by which final vowel?"),
+          options: [L(c.vowel, c.vowel),
+                    L(cases[(cases.indexOf(c)+1)%3].vowel, cases[(cases.indexOf(c)+1)%3].vowel),
+                    L(cases[(cases.indexOf(c)+2)%3].vowel, cases[(cases.indexOf(c)+2)%3].vowel)],
+          answer: 0,
+          explain: L(c.name + " → " + c.vowel + " (fonction : " + c.role + ").",
+                     c.nameEn + " → " + c.vowel + " (role: " + c.roleEn + ")."),
+        };
+      },
+    },
+
+    pronoun_isolated: {
+      lessons: ["g4"],
+      make: function () {
+        const p = rand(ISOLATED_PRONOUNS);
+        const distract = sample(ISOLATED_PRONOUNS.filter(x => x.ar !== p.ar), 3);
+        return {
+          q: L("Quel pronom isolé pour « " + p.fr + " » ?",
+               "Which independent pronoun for '" + p.en + "'?"),
+          options: [L(p.ar, p.ar), L(distract[0].ar, distract[0].ar),
+                    L(distract[1].ar, distract[1].ar), L(distract[2].ar, distract[2].ar)],
+          answer: 0,
+          explain: L("« " + p.fr + " » → " + p.ar + ". Les pronoms isolés servent de sujet (leçon 4).",
+                     "'" + p.en + "' → " + p.ar + ". Independent pronouns act as subject (lesson 4)."),
+        };
+      },
+    },
+
+    suffix_person: {
+      lessons: ["g4"],
+      make: function () {
+        const p = rand(ATTACHED_PRONOUNS);
+        const distract = sample(ATTACHED_PRONOUNS.filter(x => x.suf !== p.suf), 3);
+        const w = rand(NOUNS.filter(x => !endsTaa(x)));
+        return {
+          q: L("Dans " + w.ar + " + " + p.suf + " (« " + w.fr + " + " + p.fr + " »), le suffixe " + p.suf + " signifie…",
+               "In " + w.ar + " + " + p.suf + " ('" + w.en + " + " + p.en + "'), the suffix " + p.suf + " means…"),
+          options: [L(p.fr, p.en),
+                    L(distract[0].fr, distract[0].en),
+                    L(distract[1].fr, distract[1].en),
+                    L(distract[2].fr, distract[2].en)],
+          answer: 0,
+          explain: L("Le suffixe " + p.suf + " = « " + p.fr + " ». Le nom perd son tanwin en portant le suffixe.",
+                     "The suffix " + p.suf + " = '" + p.en + "'. The noun drops its tanwīn when carrying a suffix."),
+        };
+      },
+    },
+
+    idafa_muda_af: {
+      lessons: ["g2"],
+      make: function () {
+        // On construit une إضافة « X du Y » ; on demande d'identifier le مضاف.
+        const a = rand(NOUNS);
+        const b = rand(NOUNS.filter(x => x.ar !== a.ar));
+        const phrase = a.ar + "ُ " + "ال" + b.ar.replace(/^ال/, "") + "ِ";
+        return {
+          q: L("Dans l'إضافة " + phrase + " (« le " + a.fr + " du/de la " + b.fr + " »), lequel est le مُضَاف ?",
+               "In the iḍāfa " + phrase + " ('the " + a.en + " of the " + b.en + "'), which is the muḍāf?"),
+          options: [L(a.ar + " (1er mot)", a.ar + " (1st word)"),
+                    L(b.ar + " (2e mot)",  b.ar + " (2nd word)"),
+                    L("les deux",         "both")],
+          answer: 0,
+          explain: L("Le 1er mot d'une إضافة est le مُضَاف (jamais الـ ni tanwin). Le 2e est le مُضَاف إِلَيْه, au cas جرّ.",
+                     "The 1st word of an iḍāfa is the muḍāf (never الـ nor tanwīn). The 2nd is the muḍāf ilayhi, in the jarr case."),
+        };
+      },
+    },
   };
 
   // =========================================================================
@@ -462,24 +697,23 @@
     if (!deck) return [];
     const words = deck.words;
     const picks = words.length <= n ? shuffle(words) : sample(words, n);
+    // On alterne 4 formats pour éviter la répétition : ar→sens, sens→ar,
+    // ar→translittération, et « NON-sens » (lequel n'est PAS le sens).
     return picks.map(function (w, i) {
       const others = words.filter(x => x.ar !== w.ar);
       const gFr = gloss(w, "fr"), gEn = gloss(w, "en");
-      if (i % 2 === 0) {
-        // sens : que signifie {ar} ({tr}) ?
+      const shape = i % 4;
+      if (shape === 0) {
         const distract = sample(others, 3);
         return {
           q: L("Que signifie " + w.ar + " (" + w.tr + ") ?",
                "What does " + w.ar + " (" + w.tr + ") mean?"),
-          options: [L(gFr, gEn)].concat(
-            distract.map(x => L(gloss(x, "fr"), gloss(x, "en")))
-          ),
+          options: [L(gFr, gEn)].concat(distract.map(x => L(gloss(x, "fr"), gloss(x, "en")))),
           answer: 0,
           explain: L(w.ar + " — " + w.tr + " = " + gFr + ".",
                      w.ar + " — " + w.tr + " = " + gEn + "."),
         };
-      } else {
-        // reconnaissance : quel mot signifie « {fr} » ?
+      } else if (shape === 1) {
         const distract = sample(others, 3);
         return {
           q: L("Quel mot signifie « " + gFr + " » ?",
@@ -488,6 +722,28 @@
           answer: 0,
           explain: L(gFr + " = " + w.ar + " (" + w.tr + ").",
                      gEn + " = " + w.ar + " (" + w.tr + ")."),
+        };
+      } else if (shape === 2) {
+        // ar → translittération (repère la prononciation)
+        const distract = sample(others.filter(x => x.tr !== w.tr), 3);
+        return {
+          q: L("Comment se prononce " + w.ar + " ?",
+               "How is " + w.ar + " pronounced?"),
+          options: [L(w.tr, w.tr)].concat(distract.map(x => L(x.tr, x.tr))),
+          answer: 0,
+          explain: L(w.ar + " se lit « " + w.tr + " » — sens : " + gFr + ".",
+                     w.ar + " reads '" + w.tr + "' — meaning: " + gEn + "."),
+        };
+      } else {
+        // sens → translittération (« quelle prononciation pour ce sens ? »)
+        const distract = sample(others.filter(x => x.tr !== w.tr), 3);
+        return {
+          q: L("Quelle est la translittération du mot qui signifie « " + gFr + " » ?",
+               "Which transliteration is the word meaning '" + gEn + "'?"),
+          options: [L(w.tr, w.tr)].concat(distract.map(x => L(x.tr, x.tr))),
+          answer: 0,
+          explain: L("« " + gFr + " » = " + w.ar + " (« " + w.tr + " »).",
+                     "'" + gEn + "' = " + w.ar + " ('" + w.tr + "')."),
         };
       }
     });
