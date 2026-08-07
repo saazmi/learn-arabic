@@ -294,23 +294,6 @@
       },
     },
 
-    case_prep: {
-      lessons: ["g3"],
-      make: function () {
-        const p = rand(PARTICLES.filter(x => ["فِي", "مِنْ", "إِلَى", "عَلَى"].indexOf(x.ar) !== -1));
-        return {
-          q: L("Après la préposition " + p.ar + " (" + p.fr + "), le nom est au cas…",
-               "After the preposition " + p.ar + " (" + p.en + "), the noun is in the case…"),
-          options: [L("جَرّ (kasra)",  "jarr (kasra)"),
-                    L("رَفْع (damma)", "rafʿ (ḍamma)"),
-                    L("نَصْب (fatha)", "naṣb (fatḥa)")],
-          answer: 0,
-          explain: L("Après une préposition → génitif (جَرّ), marqué par la kasra.",
-                     "After a preposition → genitive (jarr), marked by the kasra."),
-        };
-      },
-    },
-
     plural_m: {
       lessons: ["g3"],
       make: function () {
@@ -431,7 +414,7 @@
         const cases = [
           { sign: "ـٌ", name: "رَفْع", nameEn: "rafʿ", role: "sujet",  roleEn: "subject" },
           { sign: "ـً", name: "نَصْب", nameEn: "naṣb", role: "objet",  roleEn: "object" },
-          { sign: "ـٍ", name: "جَرّ",  nameEn: "jarr", role: "après prép. / إضافة", roleEn: "after prep. / iḍāfa" },
+          { sign: "ـٍ", name: "جَرّ",  nameEn: "jarr", role: "2e mot d'une إضافة", roleEn: "2nd word of an iḍāfa" },
         ];
         const c = rand(cases);
         return {
@@ -544,7 +527,7 @@
         const cases = [
           { name: "رَفْع", nameEn: "rafʿ", vowel: "damma (ـُ)",  role: "sujet", roleEn: "subject" },
           { name: "نَصْب", nameEn: "naṣb", vowel: "fatha (ـَ)",   role: "objet direct", roleEn: "direct object" },
-          { name: "جَرّ",  nameEn: "jarr", vowel: "kasra (ـِ)",   role: "après une préposition ou dans une إضافة", roleEn: "after a preposition or in an iḍāfa" },
+          { name: "جَرّ",  nameEn: "jarr", vowel: "kasra (ـِ)",   role: "2e mot d'une إضافة", roleEn: "2nd word of an iḍāfa" },
         ];
         const c = rand(cases);
         return {
