@@ -28,20 +28,24 @@
   function sample(a, n) { return shuffle(a).slice(0, n); }
 
   // ---- POOLS de mots (pour la grammaire) --------------------------------
+  //   pl     : forme plurielle réelle et vérifiée
+  //   plType : "broken" (jamʿ taksīr, à mémoriser) | "sound-f" (retire ة + ات)
+  //            (aucun nom masculin de ce pool ne prend un pluriel masculin sain
+  //             — voir PLURAL_M plus bas pour les mots qui le prennent)
   const NOUNS = [
-    { ar: "كِتَاب", fr: "livre", g: "m" },
-    { ar: "رَجُل", fr: "homme", g: "m" },
-    { ar: "بَيْت", fr: "maison", g: "m" },
-    { ar: "قَمَر", fr: "lune", g: "m" },
-    { ar: "قَلَم", fr: "stylo", g: "m" },
-    { ar: "بَاب", fr: "porte", g: "m" },
-    { ar: "وَلَد", fr: "garçon", g: "m" },
-    { ar: "مَدْرَسَة", fr: "école", g: "f" },
-    { ar: "شَجَرَة", fr: "arbre", g: "f" },
-    { ar: "سَيَّارَة", fr: "voiture", g: "f" },
-    { ar: "شَمْس", fr: "soleil", g: "f" },
-    { ar: "أَرْض", fr: "terre", g: "f" },
-    { ar: "يَد", fr: "main", g: "f" },
+    { ar: "كِتَاب",    fr: "livre",   g: "m", pl: "كُتُب",       plType: "broken" },
+    { ar: "رَجُل",     fr: "homme",   g: "m", pl: "رِجَال",      plType: "broken" },
+    { ar: "بَيْت",     fr: "maison",  g: "m", pl: "بُيُوت",      plType: "broken" },
+    { ar: "قَمَر",     fr: "lune",    g: "m", pl: "أَقْمَار",    plType: "broken" },
+    { ar: "قَلَم",     fr: "stylo",   g: "m", pl: "أَقْلَام",    plType: "broken" },
+    { ar: "بَاب",      fr: "porte",   g: "m", pl: "أَبْوَاب",    plType: "broken" },
+    { ar: "وَلَد",     fr: "garçon",  g: "m", pl: "أَوْلَاد",    plType: "broken" },
+    { ar: "مَدْرَسَة", fr: "école",   g: "f", pl: "مَدَارِس",    plType: "broken" },
+    { ar: "شَجَرَة",   fr: "arbre",   g: "f", pl: "أَشْجَار",    plType: "broken" },
+    { ar: "سَيَّارَة", fr: "voiture", g: "f", pl: "سَيَّارَات",  plType: "sound-f" },
+    { ar: "شَمْس",     fr: "soleil",  g: "f", pl: "شُمُوس",      plType: "broken" },
+    { ar: "أَرْض",     fr: "terre",   g: "f", pl: "أَرَاضٍ",     plType: "broken" },
+    { ar: "يَد",       fr: "main",    g: "f", pl: "أَيْدٍ",      plType: "broken" },
   ];
   const VERBS = [
     { ar: "خَلَقَ", fr: "il a créé" },
@@ -79,6 +83,13 @@
   const SOLAR = "تثدذرزسشصضطظلن";
   function isSolar(word) { return SOLAR.indexOf(word.ar.charAt(0)) !== -1; }
   function endsTaa(w) { return /ة$/.test(w.ar); }
+  // ce que donnerait la RÈGLE sain-féminin (retire ة, ajoute ات) — utile
+  // pour fabriquer un mauvais distracteur quand le pluriel réel est brisé.
+  // NB : les mots du pool finissant par ة portent déjà une fatha avant la
+  // ة ; on n'en rajoute pas, sinon on aurait deux fathas empilées.
+  function soundFPlural(w) { return w.ar.replace(/ة$/, "") + "ات"; }
+  // ce que donnerait la RÈGLE sain-masculin (ون) — deuxième distracteur.
+  function soundMPlural(w) { return w.ar.replace(/ة$/, "") + "ون"; }
 
   // =========================================================================
   //  GABARITS DE GRAMMAIRE — chacun tagué par leçon(s)
@@ -229,15 +240,28 @@
       },
     },
 
-    plural_f: {
+    plural_of: {
       lessons: ["g3"],
       make: function () {
-        const w = rand(NOUNS.filter(endsTaa));
+        // Tous les noms du pool ont maintenant un `pl` vérifié + son type.
+        const w = rand(NOUNS.filter(function (x) { return x.pl; }));
+        const sf = soundFPlural(w);
+        const sm = soundMPlural(w);
+        // Options : le pluriel réel + les deux distracteurs « rule-based ».
+        // Dédupliquer pour éviter deux options identiques (mot sain-féminin).
+        const opts = [w.pl];
+        if (sf !== w.pl) opts.push(sf);
+        if (sm !== w.pl && sm !== sf) opts.push(sm);
+        const isBroken = w.plType === "broken";
         return {
-          q: "Comment former le pluriel de " + w.ar + " (" + w.fr + ") ?",
-          options: ["retirer ة puis ajouter ات", "ajouter ون", "ajouter ين"],
+          q: "Quel est le pluriel de " + w.ar + " (" + w.fr + ") ?",
+          options: opts,
           answer: 0,
-          explain: "Féminin sain : on retire la ة et on ajoute ات.",
+          explain: isBroken
+            ? w.ar + " a un pluriel BRISÉ (جمع تكسير) : " + w.pl +
+              " — à mémoriser. La règle sain-féminin donnerait " + sf +
+              ", mais elle ne s'applique pas ici."
+            : w.ar + " suit la règle sain-féminin : retire ة, ajoute ات → " + w.pl + ".",
         };
       },
     },
