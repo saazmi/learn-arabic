@@ -162,7 +162,7 @@
     },
 
     defindef: {
-      lessons: ["g1"],
+      lessons: ["g1"], maxPerQuiz: 1,
       make: function () {
         const w = rand(NOUNS);
         return {
@@ -178,7 +178,7 @@
     },
 
     makedef: {
-      lessons: ["g1"],
+      lessons: ["g1"], maxPerQuiz: 1,
       make: function () {
         const w = rand(NOUNS);
         return {
@@ -215,7 +215,7 @@
     },
 
     phrase: {
-      lessons: ["g2"],
+      lessons: ["g2"], maxPerQuiz: 1,
       make: function () {
         const w = rand(NOUNS);
         const article = w.g === "f" ? "une " : "un ";
@@ -255,7 +255,7 @@
     },
 
     idafa: {
-      lessons: ["g2"],
+      lessons: ["g2"], maxPerQuiz: 1,
       make: function () {
         const a = rand(NOUNS);
         return {
@@ -358,7 +358,7 @@
     },
 
     adj_place: {
-      lessons: ["g4"],
+      lessons: ["g4"], maxPerQuiz: 1,
       make: function () {
         const w = rand(NOUNS);
         return {
@@ -374,7 +374,7 @@
     },
 
     adj_agree: {
-      lessons: ["g4"],
+      lessons: ["g4"], maxPerQuiz: 1,
       make: function () {
         const w = rand(NOUNS);
         return {
@@ -391,7 +391,7 @@
     },
 
     nonhuman: {
-      lessons: ["g4"],
+      lessons: ["g4"], maxPerQuiz: 1,
       make: function () {
         const w = rand(NONHUMAN);
         return {
@@ -408,7 +408,7 @@
 
     // ---- NOUVEAUX GABARITS (enrichissement) ------------------------------
     chadda_role: {
-      lessons: ["g1"],
+      lessons: ["g1"], maxPerQuiz: 1,
       make: function () {
         return {
           q: L("Que fait la chadda (le signe ـّ) sur une lettre ?",
@@ -424,7 +424,7 @@
     },
 
     verb_to_be: {
-      lessons: ["g2"],
+      lessons: ["g2"], maxPerQuiz: 1,
       make: function () {
         const w = rand(NOUNS);
         return {
@@ -499,7 +499,7 @@
     },
 
     iraab_case_id: {
-      lessons: ["g3"],
+      lessons: ["g3"], maxPerQuiz: 1,
       make: function () {
         const cases = [
           { name: "رَفْع", nameEn: "rafʿ", vowel: "damma (ـُ)",  role: "sujet", roleEn: "subject" },
@@ -597,8 +597,16 @@
     const exhausted = new Set();
     templates.forEach(function (t) { count.set(t, 0); });
 
+    // Plafond effectif pour un gabarit : maxPerQuiz s'il est défini, sinon quota.
+    // Les gabarits « concept fermé » (une seule bonne réponse quelle que soit la
+    // formulation) portent maxPerQuiz: 1 — sinon ils recyclent la même question.
+    function cap(t) {
+      return (typeof t.maxPerQuiz === "number") ? Math.min(t.maxPerQuiz, quota) : quota;
+    }
+
     // essaie d'ajouter une question INÉDITE issue du gabarit t
     function tryAdd(t, tries) {
+      if (count.get(t) >= (t.maxPerQuiz != null ? t.maxPerQuiz : Infinity)) return false;
       for (let k = 0; k < tries; k++) {
         const q = t.make();
         // on déduplique sur la version FR pour rester stable inter-langues
@@ -613,23 +621,26 @@
     // 1) couverture : un de chaque gabarit
     shuffle(templates).forEach(function (t) { if (out.length < n) tryAdd(t, 6); });
 
-    // 2) remplissage dispersé sous le quota
+    // 2) remplissage dispersé sous le quota (et sous le plafond du gabarit)
     let guard = 0;
     while (out.length < n && guard < 800) {
       guard++;
       const eligible = templates.filter(function (t) {
-        return count.get(t) < quota && !exhausted.has(t);
+        return count.get(t) < cap(t) && !exhausted.has(t);
       });
       if (!eligible.length) break;
       const t = rand(eligible);
       if (!tryAdd(t, 8)) exhausted.add(t);
     }
 
-    // 3) filet : relâcher le quota si nécessaire
+    // 3) filet : relâcher le quota (mais JAMAIS le maxPerQuiz)
     guard = 0;
     while (out.length < n && guard < 800) {
       guard++;
-      const usable = templates.filter(function (t) { return !exhausted.has(t); });
+      const usable = templates.filter(function (t) {
+        const perQuizCap = (t.maxPerQuiz != null) ? t.maxPerQuiz : Infinity;
+        return !exhausted.has(t) && count.get(t) < perQuizCap;
+      });
       if (!usable.length) break;
       const t = rand(usable);
       if (!tryAdd(t, 8)) exhausted.add(t);
