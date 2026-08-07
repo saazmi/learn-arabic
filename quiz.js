@@ -91,6 +91,16 @@
     { ar: "مُعَلِّم", fr: "enseignant", en: "teacher" },
     { ar: "صَادِق",   fr: "véridique",  en: "truthful (person)" },
   ];
+  // Pluriel féminin SAIN (جمع مؤنث سالم) — mots en ة qui suivent la règle
+  //   retire ة + ات → pluriel. Aucune irrégularité, contrairement au brisé.
+  const PLURAL_F = [
+    { ar: "مُسْلِمَة",  pl: "مُسْلِمَات",  fr: "musulmane",   en: "Muslim (f.)" },
+    { ar: "مُؤْمِنَة",  pl: "مُؤْمِنَات",  fr: "croyante",    en: "believer (f.)" },
+    { ar: "طَالِبَة",   pl: "طَالِبَات",   fr: "étudiante",   en: "student (f.)" },
+    { ar: "مُعَلِّمَة", pl: "مُعَلِّمَات", fr: "enseignante", en: "teacher (f.)" },
+    { ar: "سَيَّارَة",  pl: "سَيَّارَات",  fr: "voiture",     en: "car" },
+    { ar: "كَلِمَة",    pl: "كَلِمَات",    fr: "mot",         en: "word" },
+  ];
   // pluriels de choses (non-humains) — pour la règle d'accord au féminin singulier
   const NONHUMAN = [
     { pl: "كُتُب",    fr: "livres",   en: "books" },
@@ -336,6 +346,35 @@
             isRafa
               ? "Rafʿ case (subject) → ـُونَ. In other cases it would be ـِينَ."
               : "Any case other than rafʿ (direct object, after iḍāfa, etc.) → ـِينَ. In the subject case it would be ـُونَ."
+          ),
+        };
+      },
+    },
+
+    plural_f: {
+      lessons: ["g3"], maxPerQuiz: 2,
+      make: function () {
+        // Règle sain-féminin : ة → ات. Les distracteurs piègent les erreurs
+        // typiques : appliquer la règle masculine (ون), oublier de retirer ة
+        // (ة + ات), ou confondre avec le duel (ـتان).
+        const w = rand(PLURAL_F);
+        // On retire la fatha qui précède ة (sinon on empile fatha + damma sur
+        // la consonne finale et le mot rendu est vocalement faux).
+        const bareStem = w.ar.replace(/َة$/, "").replace(/ة$/, "");
+        const wrongKeepTaa = w.ar + "ات";        // garde ة puis ajoute ات (faux)
+        const wrongSoundM  = bareStem + "ُونَ";  // règle masculine (faux)
+        return {
+          q: L("Quel est le pluriel féminin sain (جمع مؤنث سالم) de " + w.ar + " (« " + w.fr + " ») ?",
+               "What is the sound feminine plural (جمع مؤنث سالم) of " + w.ar + " ('" + w.en + "')?"),
+          options: [L(w.pl, w.pl),
+                    L(wrongSoundM, wrongSoundM),
+                    L(wrongKeepTaa, wrongKeepTaa)],
+          answer: 0,
+          explain: L(
+            "Règle : retire la ة puis ajoute ـَات → " + w.pl + ". " +
+              "Pas ـُون (règle masculine) ; pas ـةات (on retire la ة).",
+            "Rule: drop the ة and add ـَات → " + w.pl + ". " +
+              "Not ـُون (masculine rule); not ـةات (the ة must be dropped)."
           ),
         };
       },
