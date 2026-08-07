@@ -114,15 +114,17 @@
     { ar: "هُمْ",    fr: "ils",        en: "they (m.)" },
   ];
   // pronoms suffixes (leçon 4)
+  //   who = à qui/quoi renvoie le suffixe (« à moi », « à elle »…) — utilisé
+  //   pour la question de reconnaissance sans donner la traduction du possessif.
   const ATTACHED_PRONOUNS = [
-    { suf: "ي",   fr: "mon / ma",     en: "my" },
-    { suf: "كَ",  fr: "ton / ta (m.)", en: "your (m.)" },
-    { suf: "كِ",  fr: "ton / ta (f.)", en: "your (f.)" },
-    { suf: "هُ",  fr: "son / sa (m.)", en: "his" },
-    { suf: "هَا", fr: "son / sa (f.)", en: "her" },
-    { suf: "نَا", fr: "notre",         en: "our" },
-    { suf: "كُمْ", fr: "votre",        en: "your (pl.)" },
-    { suf: "هُمْ", fr: "leur (m.)",    en: "their (m.)" },
+    { suf: "ي",    fr: "mon / ma",      en: "my",           who:    "à moi",       whoEn: "to me" },
+    { suf: "كَ",   fr: "ton / ta (m.)", en: "your (m.)",    who:    "à toi (m.)",  whoEn: "to you (m.)" },
+    { suf: "كِ",   fr: "ton / ta (f.)", en: "your (f.)",    who:    "à toi (f.)",  whoEn: "to you (f.)" },
+    { suf: "هُ",   fr: "son / sa (m.)", en: "his",          who:    "à lui",       whoEn: "to him" },
+    { suf: "هَا",  fr: "son / sa (f.)", en: "her",          who:    "à elle",      whoEn: "to her" },
+    { suf: "نَا",  fr: "notre",         en: "our",          who:    "à nous",      whoEn: "to us" },
+    { suf: "كُمْ",  fr: "votre",         en: "your (pl.)",   who:    "à vous",      whoEn: "to you (pl.)" },
+    { suf: "هُمْ",  fr: "leur (m.)",     en: "their (m.)",   who:    "à eux",       whoEn: "to them (m.)" },
   ];
 
   // lettres solaires (le ل de الـ ne se prononce pas)
@@ -438,25 +440,24 @@
     question_word: {
       lessons: ["g2"], maxPerQuiz: 2,
       make: function () {
+        // On ne DONNE PAS la traduction : la question porte sur la reconnaissance
+        // du mot arabe lui-même (personne vs chose).
         const isPerson = Math.random() < 0.5;
         const noun = isPerson
-          ? rand([{ ar: "أَبٌ", fr: "père", en: "father" },
-                  { ar: "أُمٌّ", fr: "mère", en: "mother" },
-                  { ar: "رَجُلٌ", fr: "homme", en: "man" }])
-          : rand(NOUNS.filter(x => x.g === "m"));
+          ? rand([{ ar: "أَبٌ" }, { ar: "أُمٌّ" }, { ar: "رَجُلٌ" }, { ar: "وَلَدٌ" }, { ar: "طَالِبٌ" }])
+          : rand([{ ar: "كِتَابٌ" }, { ar: "بَيْتٌ" }, { ar: "قَلَمٌ" }, { ar: "شَجَرَةٌ" }, { ar: "بَابٌ" }]);
         return {
-          q: L("Pour demander « qu'est-ce que c'est ? / qui est-ce ? » à propos de " + noun.ar +
-                 " (" + (noun.fr) + "), on utilise…",
-               "To ask 'what/who is this?' about " + noun.ar + " (" + (noun.en || noun.fr) + "), you use…"),
-          options: [L(isPerson ? "مَنْ (« qui »)" : "مَا (« qu'est-ce que »)",
-                      isPerson ? "مَنْ ('who')"    : "مَا ('what')"),
-                    L(isPerson ? "مَا (« qu'est-ce que »)" : "مَنْ (« qui »)",
-                      isPerson ? "مَا ('what')"            : "مَنْ ('who')")],
+          q: L("Quelle particule utiliser pour poser une question sur " + noun.ar + " ?",
+               "Which particle do you use to ask a question about " + noun.ar + "?"),
+          options: [L(isPerson ? "مَنْ (man)" : "مَا (mā)",
+                      isPerson ? "مَنْ (man)" : "مَا (mā)"),
+                    L(isPerson ? "مَا (mā)"   : "مَنْ (man)",
+                      isPerson ? "مَا (mā)"   : "مَنْ (man)")],
           answer: 0,
-          explain: L(isPerson ? "Une personne → مَنْ. Une chose → مَا."
-                              : "Une chose → مَا. Une personne → مَنْ.",
-                     isPerson ? "A person → مَنْ. A thing → مَا."
-                              : "A thing → مَا. A person → مَنْ."),
+          explain: L(isPerson ? noun.ar + " désigne une personne → مَنْ (man)."
+                              : noun.ar + " désigne une chose → مَا (mā).",
+                     isPerson ? noun.ar + " refers to a person → مَنْ (man)."
+                              : noun.ar + " refers to a thing → مَا (mā)."),
         };
       },
     },
@@ -535,19 +536,25 @@
     suffix_person: {
       lessons: ["g4"], maxPerQuiz: 3,
       make: function () {
+        // On affiche le mot AVEC son suffixe attaché (pas de gloss français
+        // du pronom) — l'élève doit reconnaître le suffixe lui-même.
         const p = rand(ATTACHED_PRONOUNS);
         const distract = sample(ATTACHED_PRONOUNS.filter(x => x.suf !== p.suf), 3);
         const w = rand(NOUNS.filter(x => !endsTaa(x)));
+        // suffixe attaché : le nom perd son tanwin ; on met sa voyelle de fin
+        // au rafʿ (damma) par défaut. Cas spécial du ي (« mon ») qui impose
+        // une kasra sur la consonne d'appui.
+        const attached = (p.suf === "ي") ? (w.ar + "ِي") : (w.ar + "ُ" + p.suf);
         return {
-          q: L("Dans " + w.ar + " + " + p.suf + " (« " + w.fr + " + " + p.fr + " »), le suffixe " + p.suf + " signifie…",
-               "In " + w.ar + " + " + p.suf + " ('" + w.en + " + " + p.en + "'), the suffix " + p.suf + " means…"),
-          options: [L(p.fr, p.en),
-                    L(distract[0].fr, distract[0].en),
-                    L(distract[1].fr, distract[1].en),
-                    L(distract[2].fr, distract[2].en)],
+          q: L("Que renvoie le suffixe dans " + attached + " ?",
+               "What does the suffix in " + attached + " refer to?"),
+          options: [L(p.who, p.whoEn),
+                    L(distract[0].who, distract[0].whoEn),
+                    L(distract[1].who, distract[1].whoEn),
+                    L(distract[2].who, distract[2].whoEn)],
           answer: 0,
-          explain: L("Le suffixe " + p.suf + " = « " + p.fr + " ». Le nom perd son tanwin en portant le suffixe.",
-                     "The suffix " + p.suf + " = '" + p.en + "'. The noun drops its tanwīn when carrying a suffix."),
+          explain: L("Le suffixe " + p.suf + " renvoie " + p.who + " (« " + p.fr + " »).",
+                     "The suffix " + p.suf + " refers " + p.whoEn + " ('" + p.en + "')."),
         };
       },
     },
@@ -555,22 +562,32 @@
     idafa_muda_af: {
       lessons: ["g2"], maxPerQuiz: 2,
       make: function () {
-        // On construit une إضافة « X du Y » ; on demande d'identifier le مضاف.
+        // On construit une إضافة « X du Y » ; on demande soit le مُضَاف
+        // (1er mot), soit le مُضَاف إِلَيْه (2e mot), tiré au hasard.
         const a = rand(NOUNS);
         const b = rand(NOUNS.filter(x => x.ar !== a.ar));
         const phrase = a.ar + "ُ " + "ال" + b.ar.replace(/^ال/, "") + "ِ";
+        const askIlayh = Math.random() < 0.5;
         // Guillemets « » autour de la phrase arabe : isole la séquence RTL du
         // mot « إضافة » qui précède, sinon les deux runs arabes se recollent
         // et l'ordre visuel du groupe devient trompeur.
+        const targetFr = askIlayh ? "مُضَاف إِلَيْه" : "مُضَاف";
+        const targetEn = askIlayh ? "muḍāf ilayh"   : "muḍāf";
         return {
-          q: L("Dans l'إضافة suivante — « " + phrase + " » (« " + frLe(a) + " " + frDe(b) + " ») — lequel est le مُضَاف ?",
-               "In the following iḍāfa — '" + phrase + "' ('the " + a.en + " of the " + b.en + "') — which is the muḍāf?"),
+          q: L("Dans l'إضافة suivante — « " + phrase + " » (« " + frLe(a) + " " + frDe(b) + " ») — lequel est le " + targetFr + " ?",
+               "In the following iḍāfa — '" + phrase + "' ('the " + a.en + " of the " + b.en + "') — which is the " + targetEn + "?"),
           options: [L(a.ar + " (1er mot)", a.ar + " (1st word)"),
-                    L(b.ar + " (2e mot)",  b.ar + " (2nd word)"),
-                    L("les deux",         "both")],
-          answer: 0,
-          explain: L("Le 1er mot d'une إضافة est le مُضَاف (jamais الـ ni tanwin). Le 2e est le مُضَاف إِلَيْه, au cas جرّ.",
-                     "The 1st word of an iḍāfa is the muḍāf (never الـ nor tanwīn). The 2nd is the muḍāf ilayhi, in the jarr case."),
+                    L(b.ar + " (2e mot)",  b.ar + " (2nd word)")],
+          // 1er mot = مُضَاف ; 2e mot = مُضَاف إِلَيْه
+          answer: askIlayh ? 1 : 0,
+          explain: L(
+            askIlayh
+              ? "Le 2e mot est le مُضَاف إِلَيْه (le « possesseur »), toujours au cas جَرّ (kasra)."
+              : "Le 1er mot est le مُضَاف (le « possédé »). Il ne prend jamais الـ ni tanwin.",
+            askIlayh
+              ? "The 2nd word is the muḍāf ilayh (the 'possessor'), always in the jarr case (kasra)."
+              : "The 1st word is the muḍāf (the 'possessed'). It never takes الـ nor tanwīn."
+          ),
         };
       },
     },
