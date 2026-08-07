@@ -326,26 +326,23 @@
         //   نَصْب / جَرّ (autres) → ـِينَ
         // On tire au sort le cas pour tester les deux formes.
         const w = rand(PLURAL_M);
-        const isRafa = Math.random() < 0.5;
-        // Un mini-contexte concret plutôt qu'une étiquette abstraite.
-        const ctxFr = isRafa
-          ? "sujet d'une phrase (« " + w.ar + "ون sont ici »)"
-          : "objet direct (« je vois les " + w.fr + "s »)";
-        const ctxEn = isRafa
-          ? "subject of a sentence ('the " + w.en + "s are here')"
-          : "direct object ('I see the " + w.en + "s')";
+        // On tire un des trois cas au sort — chacun a sa terminaison propre :
+        //   رَفْع → ـُونَ ;   نَصْب → ـِينَ ;   جَرّ → ـِينَ.
+        const targetCase = rand(["رَفْع", "نَصْب", "جَرّ"]);
+        const enCase = { "رَفْع": "rafʿ", "نَصْب": "naṣb", "جَرّ": "jarr" }[targetCase];
+        const isRafa = targetCase === "رَفْع";
         return {
-          q: L("Quand un pluriel masculin sain (comme " + w.ar + ", « " + w.fr + " ») est " + ctxFr + ", il se termine par…",
-               "When a sound masculine plural (like " + w.ar + ", '" + w.en + "') is " + ctxEn + ", it ends in…"),
+          q: L("Au cas " + targetCase + ", le pluriel masculin sain de " + w.ar + " (« " + w.fr + " ») se termine par…",
+               "In the " + enCase + " case, the sound masculine plural of " + w.ar + " ('" + w.en + "') ends in…"),
           options: [L("ـُونَ", "ـُونَ"), L("ـِينَ", "ـِينَ"), L("ـَات", "ـَات")],
           answer: isRafa ? 0 : 1,
           explain: L(
             isRafa
-              ? "Cas رَفْع (sujet) → ـُونَ. Dans les autres cas, on aurait ـِينَ."
-              : "Autre cas que رَفْع (objet direct, après إضافة, etc.) → ـِينَ. Au cas sujet ce serait ـُونَ.",
+              ? "Au cas رَفْع → ـُونَ. Aux cas نَصْب / جَرّ ce serait ـِينَ."
+              : "Aux cas نَصْب et جَرّ → ـِينَ. Au cas رَفْع ce serait ـُونَ.",
             isRafa
-              ? "Rafʿ case (subject) → ـُونَ. In other cases it would be ـِينَ."
-              : "Any case other than rafʿ (direct object, after iḍāfa, etc.) → ـِينَ. In the subject case it would be ـُونَ."
+              ? "In rafʿ → ـُونَ. In naṣb / jarr it would be ـِينَ."
+              : "In naṣb and jarr → ـِينَ. In rafʿ it would be ـُونَ."
           ),
         };
       },
@@ -530,20 +527,20 @@
           ? w.ar.replace(/ة$/, "تَيْن")
           : w.ar + "َيْن";
         const opts = [L(dual, dual)];
-        if (distractDualNasb !== dual) opts.push(L(distractDualNasb + " (نصب/جرّ)", distractDualNasb + " (naṣb/jarr)"));
+        if (distractDualNasb !== dual) opts.push(L(distractDualNasb + " (نَصْب / جَرّ)", distractDualNasb + " (naṣb / jarr)"));
         if (distractPl !== dual && distractPl !== distractDualNasb) opts.push(L(distractPl + " (pluriel)", distractPl + " (plural)"));
         return {
-          q: L("Quel est le duel (au cas sujet) de " + w.ar + " (" + w.fr + ") ?",
-               "What is the dual (subject case) of " + w.ar + " (" + w.en + ")?"),
+          q: L("Quel est le duel au cas رَفْع de " + w.ar + " (« " + w.fr + " ») ?",
+               "What is the dual in the rafʿ case of " + w.ar + " ('" + w.en + "')?"),
           options: opts,
           answer: 0,
           explain: L(
             endsTaa(w)
-              ? "Duel féminin : ة → ت + ـَان → " + dual + ". Aux autres cas : ـتَيْن."
-              : "Duel : ajoute ـَان au singulier → " + dual + ". Aux autres cas : ـَيْن.",
+              ? "Duel féminin au رَفْع : ة → ت + ـَان → " + dual + ". Aux cas نَصْب / جَرّ : ـتَيْن."
+              : "Duel au رَفْع : ajoute ـَان au singulier → " + dual + ". Aux cas نَصْب / جَرّ : ـَيْن.",
             endsTaa(w)
-              ? "Feminine dual: ة → ت + ـَان → " + dual + ". In other cases: ـتَيْن."
-              : "Dual: add ـَان to the singular → " + dual + ". In other cases: ـَيْن."
+              ? "Feminine dual in rafʿ: ة → ت + ـَان → " + dual + ". In naṣb / jarr: ـتَيْن."
+              : "Dual in rafʿ: add ـَان to the singular → " + dual + ". In naṣb / jarr: ـَيْن."
           ),
         };
       },
