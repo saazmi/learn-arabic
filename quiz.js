@@ -311,14 +311,32 @@
     plural_m: {
       lessons: ["g3"], maxPerQuiz: 2,
       make: function () {
+        // La forme du pluriel masculin sain change selon le cas :
+        //   رَفْع (sujet)      → ـُونَ
+        //   نَصْب / جَرّ (autres) → ـِينَ
+        // On tire au sort le cas pour tester les deux formes.
         const w = rand(PLURAL_M);
+        const isRafa = Math.random() < 0.5;
+        // Un mini-contexte concret plutôt qu'une étiquette abstraite.
+        const ctxFr = isRafa
+          ? "sujet d'une phrase (« " + w.ar + "ون sont ici »)"
+          : "objet direct (« je vois les " + w.fr + "s »)";
+        const ctxEn = isRafa
+          ? "subject of a sentence ('the " + w.en + "s are here')"
+          : "direct object ('I see the " + w.en + "s')";
         return {
-          q: L("Le pluriel masculin sain de " + w.ar + " (" + w.fr + "), au cas sujet, se termine par…",
-               "The sound masculine plural of " + w.ar + " (" + w.en + "), in the subject case, ends with…"),
+          q: L("Quand un pluriel masculin sain (comme " + w.ar + ", « " + w.fr + " ») est " + ctxFr + ", il se termine par…",
+               "When a sound masculine plural (like " + w.ar + ", '" + w.en + "') is " + ctxEn + ", it ends in…"),
           options: [L("ـُونَ", "ـُونَ"), L("ـِينَ", "ـِينَ"), L("ـَات", "ـَات")],
-          answer: 0,
-          explain: L("Masculin sain, cas sujet : ـُونَ (et ـِينَ dans les autres cas).",
-                     "Sound masculine, subject case: ـُونَ (and ـِينَ in the other cases)."),
+          answer: isRafa ? 0 : 1,
+          explain: L(
+            isRafa
+              ? "Cas رَفْع (sujet) → ـُونَ. Dans les autres cas, on aurait ـِينَ."
+              : "Autre cas que رَفْع (objet direct, après إضافة, etc.) → ـِينَ. Au cas sujet ce serait ـُونَ.",
+            isRafa
+              ? "Rafʿ case (subject) → ـُونَ. In other cases it would be ـِينَ."
+              : "Any case other than rafʿ (direct object, after iḍāfa, etc.) → ـِينَ. In the subject case it would be ـُونَ."
+          ),
         };
       },
     },
