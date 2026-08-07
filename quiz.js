@@ -383,29 +383,27 @@
     plural_of: {
       lessons: ["g3"], maxPerQuiz: 3,
       make: function () {
-        const w = rand(NOUNS.filter(function (x) { return x.pl; }));
+        // On se limite aux pluriels BRISÉS : le sain-féminin est traité par
+        // plural_f (avec ses propres pièges). Ici on entraîne la mémorisation
+        // du pluriel irrégulier + le réflexe « la règle sain ne s'applique pas ».
+        const w = rand(NOUNS.filter(function (x) { return x.plType === "broken"; }));
         const sf = soundFPlural(w);
         const sm = soundMPlural(w);
         const opts = [L(w.pl, w.pl)];
         if (sf !== w.pl) opts.push(L(sf, sf));
         if (sm !== w.pl && sm !== sf) opts.push(L(sm, sm));
-        const isBroken = w.plType === "broken";
         return {
           q: L("Quel est le pluriel de " + w.ar + " (" + w.fr + ") ?",
                "What is the plural of " + w.ar + " (" + w.en + ")?"),
           options: opts,
           answer: 0,
           explain: L(
-            isBroken
-              ? w.ar + " a un pluriel BRISÉ (جمع تكسير) : " + w.pl +
-                " — à mémoriser. La règle sain-féminin donnerait " + sf +
-                ", mais elle ne s'applique pas ici."
-              : w.ar + " suit la règle sain-féminin : retire ة, ajoute ات → " + w.pl + ".",
-            isBroken
-              ? w.ar + " has a BROKEN plural (جمع تكسير): " + w.pl +
-                " — memorise it. The sound-feminine rule would give " + sf +
-                ", but it doesn't apply here."
-              : w.ar + " follows the sound-feminine rule: drop ة, add ات → " + w.pl + "."
+            w.ar + " a un pluriel BRISÉ (جمع تكسير) : " + w.pl +
+              " — à mémoriser. La règle sain-féminin donnerait " + sf +
+              ", mais elle ne s'applique pas ici.",
+            w.ar + " has a BROKEN plural (جمع تكسير): " + w.pl +
+              " — memorise it. The sound-feminine rule would give " + sf +
+              ", but it doesn't apply here."
           ),
         };
       },
