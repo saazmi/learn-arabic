@@ -225,6 +225,23 @@ bdi { font-family: var(--arabic); font-style: normal; }
   letter-spacing: 0.02em; font-weight: 600;
 }
 
+/* ---- 4-par-page : grille 2×2 (paysage) / colonne (portrait) ------------- */
+.vcard-grid {
+  display: grid; gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.vcard-grid .vcard-quad {
+  min-height: 0; padding: 1.1rem 1rem;
+}
+.vcard-grid .vcard-quad .vcard-ar { font-size: clamp(2rem, 6vh, 3rem); }
+.vcard-grid .vcard-quad .vcard-back { margin-top: 0.7rem; padding-top: 0.7rem; }
+.vcard-grid .vcard-quad .vcard-tr  { font-size: 0.95rem; }
+.vcard-grid .vcard-quad .vcard-fr  { font-size: clamp(1rem, 2.6vw, 1.25rem); margin-top: 0.25rem; }
+.vcard-grid .vcard-quad .vcard-count { margin-top: 0.4rem; font-size: 0.72rem; }
+@media (max-width: 720px), (orientation: portrait) {
+  .vcard-grid { grid-template-columns: 1fr; }
+}
+
 /* ---- « Acquis » : coche par mot + barre de progression par jeu ---------- */
 .acq-row { display: flex; justify-content: center; margin-top: 1.3rem; }
 .acq-toggle {
@@ -272,6 +289,8 @@ bdi { font-family: var(--arabic); font-style: normal; }
 
 /* ---- Histoire des prophètes --------------------------------------------- */
 .story-card { display: block; text-align: left; padding: clamp(1.4rem, 4vw, 2.2rem); }
+.story-spread { display: flex; flex-direction: column; gap: 1rem; }
+.story-spread .story-card { margin: 0; }
 .story-ar {
   font-family: var(--arabic); direction: rtl; text-align: right;
   font-size: clamp(1.6rem, 4.5vw, 2.3rem); line-height: 1.9; color: var(--ink);

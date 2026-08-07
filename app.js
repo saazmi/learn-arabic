@@ -557,59 +557,80 @@
     });
   }
 
-  // ---- parcourir les cartes de vocabulaire -------------------------------
-  function browse(deck, i) {
+  // ---- parcourir les cartes de vocabulaire (4 mots par page) -------------
+  //   Une page = 4 mots. Un seul bouton « Acquis » agit sur les 4 à la fois :
+  //   il s'allume quand les 4 sont tous acquis ; sinon un clic marque les 4.
+  const VOCAB_PER_PAGE = 4;
+  function browse(deck, startIdx) {
     const total = deck.words.length;
-    if (typeof i !== "number") i = Math.min(getPos("v", deck.id), total - 1);
-    if (i < 0) i = 0;
-    setPos("v", deck.id, i);
-    const w = deck.words[i];
-    const pct = Math.round((i / total) * 100);
-    const last = i === total - 1;
+    const pages = Math.max(1, Math.ceil(total / VOCAB_PER_PAGE));
+    if (typeof startIdx !== "number") {
+      const savedIdx = Math.min(getPos("v", deck.id), total - 1);
+      startIdx = Math.max(0, savedIdx - (savedIdx % VOCAB_PER_PAGE));
+    }
+    if (startIdx < 0) startIdx = 0;
+    if (startIdx >= total) startIdx = (pages - 1) * VOCAB_PER_PAGE;
+    setPos("v", deck.id, startIdx);
 
-    const acquired = isAcquired(deck.id, w.ar);
-    const countChip = (typeof w.count === "number")
-      ? '<div class="vcard-count">' + t("vocab.countInQuran", w.count) + "</div>"
-      : "";
+    const page = Math.floor(startIdx / VOCAB_PER_PAGE);
+    const words = deck.words.slice(startIdx, startIdx + VOCAB_PER_PAGE);
+    const pct = Math.round((page / pages) * 100);
+    const last = page === pages - 1;
+    const allAcq = words.every(function (w) { return isAcquired(deck.id, w.ar); });
 
-    focus(
-      '<div class="study">' +
-        '<div class="phase-label">' + t("vocab.phase", pickLang(deck.title), i + 1, total) + "</div>" +
-        '<div class="progress"><span style="width:' + pct + '%"></span></div>' +
-        '<div class="card vcard">' +
+    let cardsHtml = "";
+    words.forEach(function (w) {
+      const countChip = (typeof w.count === "number")
+        ? '<div class="vcard-count">' + t("vocab.countInQuran", w.count) + "</div>"
+        : "";
+      cardsHtml +=
+        '<div class="card vcard vcard-quad">' +
           '<div class="vcard-ar" dir="rtl">' + w.ar + "</div>" +
           '<div class="vcard-back">' +
             '<div class="vcard-tr">' + w.tr + "</div>" +
             '<div class="vcard-fr">' + pickLang(w.fr) + "</div>" +
             countChip +
           "</div>" +
-        "</div>" +
+        "</div>";
+    });
+
+    focus(
+      '<div class="study">' +
+        '<div class="phase-label">' + t("vocab.phase", pickLang(deck.title), page + 1, pages) + "</div>" +
+        '<div class="progress"><span style="width:' + pct + '%"></span></div>' +
+        '<div class="vcard-grid">' + cardsHtml + "</div>" +
         '<div class="acq-row">' +
-          '<button class="acq-toggle' + (acquired ? " on" : "") + '" id="acq" ' +
-            'aria-pressed="' + (acquired ? "true" : "false") + '">' +
+          '<button class="acq-toggle' + (allAcq ? " on" : "") + '" id="acq" ' +
+            'aria-pressed="' + (allAcq ? "true" : "false") + '">' +
             '<span class="acq-check">✓</span> ' +
             '<span class="acq-label">' + t("vocab.acquis") + "</span>" +
           "</button>" +
         "</div>" +
         '<div class="nav-row">' +
-          (i > 0 ? '<button class="btn btn-ghost" id="prev">' + t("btn.prev") + "</button>" : '<span class="spacer"></span>') +
+          (page > 0 ? '<button class="btn btn-ghost" id="prev">' + t("btn.prev") + "</button>" : '<span class="spacer"></span>') +
           '<button class="btn btn-primary" id="next">' + (last ? t("btn.finish") : t("btn.next")) + "</button>" +
         "</div>" +
       "</div>",
       t("vocab.title"), screenVocab
     );
 
-    if (i > 0) document.getElementById("prev").onclick = function () { browse(deck, i - 1); };
+    if (page > 0) document.getElementById("prev").onclick = function () {
+      browse(deck, startIdx - VOCAB_PER_PAGE);
+    };
     document.getElementById("next").onclick = function () {
       if (last) { setPos("v", deck.id, total); screenVocab(); }
-      else browse(deck, i + 1);
+      else browse(deck, startIdx + VOCAB_PER_PAGE);
     };
-    // toggle « acquis » — la pastille passe du gris au vert
+    // toggle « acquis » — marque les 4 mots de la page d'un seul coup
     const acqBtn = document.getElementById("acq");
     acqBtn.onclick = function () {
-      const on = toggleAcquired(deck.id, w.ar);
-      acqBtn.classList.toggle("on", on);
-      acqBtn.setAttribute("aria-pressed", on ? "true" : "false");
+      // état cible : si TOUS déjà acquis → on décoche tout ; sinon on marque tout.
+      const target = !words.every(function (w) { return isAcquired(deck.id, w.ar); });
+      words.forEach(function (w) {
+        if (isAcquired(deck.id, w.ar) !== target) toggleAcquired(deck.id, w.ar);
+      });
+      acqBtn.classList.toggle("on", target);
+      acqBtn.setAttribute("aria-pressed", target ? "true" : "false");
     };
   }
 
@@ -659,12 +680,21 @@
     });
   }
 
+  // Une « planche » = 2 cartes consécutives (4 phrases). On avance de 2 en 2.
+  const STORY_CARDS_PER_SPREAD = 2;
   function readStory(story, i) {
     stopAudio();
-    const card = story.cards[i];
     const total = story.cards.length;
-    const pct = Math.round((i / total) * 100);
-    const last = i === total - 1;
+    if (typeof i !== "number") i = 0;
+    // On aligne toujours sur un début de planche.
+    i = i - (i % STORY_CARDS_PER_SPREAD);
+    if (i < 0) i = 0;
+    if (i >= total) i = total - (((total - 1) % STORY_CARDS_PER_SPREAD) + 1) + 1;
+
+    const spreads = Math.ceil(total / STORY_CARDS_PER_SPREAD);
+    const spreadIdx = Math.floor(i / STORY_CARDS_PER_SPREAD);
+    const pct = Math.round((spreadIdx / spreads) * 100);
+    const last = spreadIdx === spreads - 1;
 
     const LOUPE = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" ' +
       'stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>';
@@ -687,72 +717,87 @@
              '<div class="analyse-take">' + pickLang(an.takeaway) + "</div>";
     }
 
-    // chaque phrase : arabe, sens grisé, et son propre bouton d'analyse
-    // card.fr may be an array of strings (FR only) OR an array of {fr, en} objects.
-    let lines = "";
-    card.ar.forEach(function (a, idx) {
-      const glossField = (card.fr && card.fr[idx]) || (card.gloss && card.gloss[idx]) || "";
-      lines += '<div class="story-line">' +
-        '<p class="story-ar" dir="rtl">' + a + "</p>" +
-        '<p class="story-fr">' + pickLang(glossField) + "</p>";
-      if (card.an && card.an[idx]) {
-        lines += '<button class="loupe-btn" data-target="an-' + idx + '" ' +
-                   'title="' + t("stories.analyseTitle") + '" aria-label="' + t("stories.analyseTitle") + '">' + LOUPE + "</button>" +
-                 '<div class="analyse-panel" id="an-' + idx + '" hidden>' +
-                   '<div class="analyse-head">' + t("stories.analyseTitle") + "</div>" + renderAn(card.an[idx]) +
-                 "</div>";
-      }
-      lines += "</div>";
-    });
+    // Rendu d'UNE carte — préfixé pour ne pas collisionner d'IDs entre les
+    // deux cartes de la planche (loupe & panneaux de versets).
+    function renderCard(card, cardIdx) {
+      let lines = "";
+      card.ar.forEach(function (a, idx) {
+        const glossField = (card.fr && card.fr[idx]) || (card.gloss && card.gloss[idx]) || "";
+        const anId = "an-" + cardIdx + "-" + idx;
+        lines += '<div class="story-line">' +
+          '<p class="story-ar" dir="rtl">' + a + "</p>" +
+          '<p class="story-fr">' + pickLang(glossField) + "</p>";
+        if (card.an && card.an[idx]) {
+          lines += '<button class="loupe-btn" data-target="' + anId + '" ' +
+                     'title="' + t("stories.analyseTitle") + '" aria-label="' + t("stories.analyseTitle") + '">' + LOUPE + "</button>" +
+                   '<div class="analyse-panel" id="' + anId + '" hidden>' +
+                     '<div class="analyse-head">' + t("stories.analyseTitle") + "</div>" + renderAn(card.an[idx]) +
+                   "</div>";
+        }
+        lines += "</div>";
+      });
 
-    let refsHtml = "";
-    (card.refs || []).forEach(function (ref) {
-      const v = VERSES[ref];
-      if (!v) return;
-      const pid = "panel-" + ref.replace(":", "-");
-      // Verses may carry `.fr` (legacy) alongside `.en` once fetched bilingually.
-      const trans = lang === "en" ? (v.en || v.fr) : (v.fr || v.en);
-      const nameField = pickLang(v.frName || v.name) || v.frName || "";
-      refsHtml +=
-        '<div class="verse-block">' +
-          '<button class="verse-chip" data-ref="' + ref + '">' +
-            '<span class="q-ic" dir="rtl">۩</span> ' + nameField + " " + ref +
-          "</button>" +
-          '<div class="verse-panel" id="' + pid + '" hidden>' +
-            '<div class="verse-ar" dir="rtl">' + v.ar + "</div>" +
-            '<div class="verse-fr">' + trans + "</div>" +
-            '<div class="verse-foot">' +
-              '<span class="verse-src" dir="rtl">' + v.surah + " · " + v.ayah + "</span>" +
-              '<button class="btn-listen" data-audio="' + v.audio + '">' + t("stories.listen") + "</button>" +
+      let refsHtml = "";
+      (card.refs || []).forEach(function (ref) {
+        const v = VERSES[ref];
+        if (!v) return;
+        const pid = "panel-" + cardIdx + "-" + ref.replace(":", "-");
+        const trans = lang === "en" ? (v.en || v.fr) : (v.fr || v.en);
+        const nameField = pickLang(v.frName || v.name) || v.frName || "";
+        refsHtml +=
+          '<div class="verse-block">' +
+            '<button class="verse-chip" data-panel="' + pid + '">' +
+              '<span class="q-ic" dir="rtl">۩</span> ' + nameField + " " + ref +
+            "</button>" +
+            '<div class="verse-panel" id="' + pid + '" hidden>' +
+              '<div class="verse-ar" dir="rtl">' + v.ar + "</div>" +
+              '<div class="verse-fr">' + trans + "</div>" +
+              '<div class="verse-foot">' +
+                '<span class="verse-src" dir="rtl">' + v.surah + " · " + v.ayah + "</span>" +
+                '<button class="btn-listen" data-audio="' + v.audio + '">' + t("stories.listen") + "</button>" +
+              "</div>" +
             "</div>" +
-          "</div>" +
-        "</div>";
-    });
+          "</div>";
+      });
+
+      return '<div class="card story-card">' + lines +
+             (refsHtml ? '<div class="verse-refs">' + refsHtml + "</div>" : "") +
+             "</div>";
+    }
+
+    // Deux cartes par planche (la dernière planche peut n'en contenir qu'une).
+    let cardsHtml = "";
+    for (let k = 0; k < STORY_CARDS_PER_SPREAD; k++) {
+      const c = story.cards[i + k];
+      if (c) cardsHtml += renderCard(c, i + k);
+    }
 
     const storyTitleLatin = pickLang(story.titleFr || story.titleLatin || story.titleEn);
 
     focus(
       '<div class="study story">' +
-        '<div class="phase-label">' + t("stories.phase", storyTitleLatin, i + 1, total) + "</div>" +
+        '<div class="phase-label">' + t("stories.phase", storyTitleLatin, spreadIdx + 1, spreads) + "</div>" +
         '<div class="progress"><span style="width:' + pct + '%"></span></div>' +
-        '<div class="card story-card">' + lines +
-          (refsHtml ? '<div class="verse-refs">' + refsHtml + "</div>" : "") +
-        "</div>" +
+        '<div class="story-spread">' + cardsHtml + "</div>" +
         '<div class="nav-row">' +
-          (i > 0 ? '<button class="btn btn-ghost" id="prev">' + t("btn.prev") + "</button>" : '<span class="spacer"></span>') +
+          (spreadIdx > 0 ? '<button class="btn btn-ghost" id="prev">' + t("btn.prev") + "</button>" : '<span class="spacer"></span>') +
           '<button class="btn btn-primary" id="next">' + (last ? t("btn.finish") : t("btn.next")) + "</button>" +
         "</div>" +
       "</div>",
       t("nav.stories"), function () { stopAudio(); screenStories(); }
     );
 
-    if (i > 0) document.getElementById("prev").onclick = function () { readStory(story, i - 1); };
+    if (spreadIdx > 0) document.getElementById("prev").onclick = function () {
+      readStory(story, i - STORY_CARDS_PER_SPREAD);
+    };
     document.getElementById("next").onclick = function () {
-      if (last) { stopAudio(); screenStories(); } else readStory(story, i + 1);
+      if (last) { stopAudio(); screenStories(); }
+      else readStory(story, i + STORY_CARDS_PER_SPREAD);
     };
     Array.prototype.forEach.call(document.querySelectorAll(".verse-chip"), function (chip) {
       chip.onclick = function () {
-        const panel = document.getElementById("panel-" + chip.getAttribute("data-ref").replace(":", "-"));
+        const panel = document.getElementById(chip.getAttribute("data-panel"));
+        if (!panel) return;
         panel.hidden = !panel.hidden;
         chip.classList.toggle("open", !panel.hidden);
       };
