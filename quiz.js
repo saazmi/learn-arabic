@@ -407,29 +407,6 @@
     },
 
     // ---- NOUVEAUX GABARITS (enrichissement) ------------------------------
-    tanwin_case: {
-      lessons: ["g1"],
-      make: function () {
-        const w = rand(NOUNS.filter(x => !endsTaa(x)));
-        const cases = [
-          { sign: "ـٌ", name: "رَفْع", nameEn: "rafʿ", role: "sujet",  roleEn: "subject" },
-          { sign: "ـً", name: "نَصْب", nameEn: "naṣb", role: "objet",  roleEn: "object" },
-          { sign: "ـٍ", name: "جَرّ",  nameEn: "jarr", role: "2e mot d'une إضافة", roleEn: "2nd word of an iḍāfa" },
-        ];
-        const c = rand(cases);
-        return {
-          q: L("Sur " + w.ar + " (" + w.fr + ") on lit un tanwin " + c.sign + ". Quel cas ?",
-               "On " + w.ar + " (" + w.en + ") you see the tanwīn " + c.sign + ". Which case?"),
-          options: [L(c.name + " — " + c.role,       c.nameEn + " — " + c.roleEn),
-                    L(cases[(cases.indexOf(c)+1)%3].name, cases[(cases.indexOf(c)+1)%3].nameEn),
-                    L(cases[(cases.indexOf(c)+2)%3].name, cases[(cases.indexOf(c)+2)%3].nameEn)],
-          answer: 0,
-          explain: L(c.sign + " (damma / fatha / kasra doublées) marque " + c.name + " — " + c.role + ".",
-                     c.sign + " (doubled ḍamma / fatḥa / kasra) marks " + c.nameEn + " — " + c.roleEn + "."),
-        };
-      },
-    },
-
     chadda_role: {
       lessons: ["g1"],
       make: function () {
