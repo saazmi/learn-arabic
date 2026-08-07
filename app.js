@@ -14,6 +14,165 @@
   const STORIES = window.STORIES || [];
   const VERSES = window.VERSES || {};
 
+  // =========================================================================
+  //  i18n — FR / EN
+  //  UI strings live here. Card CONTENT (lesson.front, w.fr/w.en, etc.) is
+  //  language-aware via pickLang() below; this dict only covers chrome.
+  // =========================================================================
+  const LANG_KEY = "learnArabic.lang";
+  const STRINGS = {
+    fr: {
+      "brand":               "Apprendre<br>l'arabe",
+      "back":                "Retour",
+      "nav.home":            "Accueil",
+      "nav.grammar":         "Grammaire",
+      "nav.vocab":           "Vocabulaire",
+      "nav.stories":         "Récits",
+      "home.welcome":        "Ahlan wa sahlan",
+      "home.greeting.day":   "Prête à apprendre ?",
+      "home.greeting.eve":   "Une séance ce soir ?",
+      "home.tile.grammar":   "Grammaire",
+      "home.tile.grammar.s": "{0} leçons — apprendre &amp; réviser",
+      "home.tile.vocab":     "Vocabulaire",
+      "home.tile.vocab.s":   "{0} / {1} mots acquis",
+      "home.tile.stories":   "Récits du Coran",
+      "home.tile.stories.s": "{0} récit{p} — lecture &amp; versets",
+      "home.footnote":       "Grammaire : {0} / {1}<br>Prends ton temps — reviens quand tu veux.",
+      "grammar.title":       "Grammaire",
+      "grammar.intro":       "Touche une leçon pour apprendre · le bouton <b>Quiz</b> pour réviser.",
+      "grammar.revall":      "Quiz de révision · toute la grammaire",
+      "grammar.reviewLabel": "Grammaire",
+      "grammar.cardsChip":   "{0}/{1} cartes",
+      "grammar.phase":       "Leçon {0} · Apprentissage · {1}/{2}",
+      "grammar.lessonQuiz":  "Leçon {0}",
+      "grammar.toQuiz":      "Passer au quiz →",
+      "vocab.title":         "Vocabulaire",
+      "vocab.intro":         "Touche un jeu pour parcourir · marque un mot comme <b>acquis</b> quand tu le connais. Bouton <b>Quiz</b> pour te tester.",
+      "vocab.total":         "Progression totale : <b>{0} / {1}</b> mots acquis",
+      "vocab.wordsCount":    "{0} mots",
+      "vocab.wordsAcquired": "{0}/{1} acquis",
+      "vocab.acquis":        "Acquis",
+      "vocab.countInQuran":  "{0}&nbsp;× dans le Coran",
+      "vocab.phase":         "{0} · {1}/{2}",
+      "stories.title":       "Les récits du Coran",
+      "stories.intro":       "Lis l'histoire en arabe. Le français est sous chaque ligne ; touche une référence pour lire et écouter le verset.",
+      "stories.phase":       "{0} · {1}/{2}",
+      "stories.listen":      "▶ Écouter",
+      "stories.audioErr":    "⚠ indisponible",
+      "stories.audioOff":    "⚠ hors-ligne",
+      "stories.pause":       "⏸ Pause",
+      "stories.analyseTitle":"Analyser la phrase",
+      "quiz.phase":          "{0} · Quiz · {1}/{2}",
+      "quiz.nextQ":          "Question suivante →",
+      "quiz.seeResult":      "Voir le résultat →",
+      "quiz.correct":        "✓ Bien vu ! ",
+      "quiz.wrong":          "Pas tout à fait. ",
+      "quiz.finishTitle":    "{0} — Quiz",
+      "quiz.perfect":        "Sans faute. Tu maîtrises.",
+      "quiz.good":           "Très bien. Encore un tour et ce sera parfait.",
+      "quiz.retry":          "C'est en révisant qu'on retient. Reprends tranquillement — tu vas y arriver.",
+      "quiz.again":          "Refaire (nouvelles questions)",
+      "quiz.done":           "Terminer",
+      "btn.prev":            "‹ Précédent",
+      "btn.next":            "Suivant →",
+      "btn.finish":          "Terminer",
+      "theme.toDark":        "Thème sombre",
+      "theme.toLight":       "Thème clair",
+      "lang.toFR":           "Passer en français",
+      "lang.toEN":           "Switch to English",
+    },
+    en: {
+      "brand":               "Learn<br>Arabic",
+      "back":                "Back",
+      "nav.home":            "Home",
+      "nav.grammar":         "Grammar",
+      "nav.vocab":           "Vocabulary",
+      "nav.stories":         "Stories",
+      "home.welcome":        "Ahlan wa sahlan",
+      "home.greeting.day":   "Ready to learn?",
+      "home.greeting.eve":   "A study session tonight?",
+      "home.tile.grammar":   "Grammar",
+      "home.tile.grammar.s": "{0} lessons — learn &amp; review",
+      "home.tile.vocab":     "Vocabulary",
+      "home.tile.vocab.s":   "{0} / {1} words acquired",
+      "home.tile.stories":   "Stories of the Qur'an",
+      "home.tile.stories.s": "{0} stor{p} — reading &amp; verses",
+      "home.footnote":       "Grammar: {0} / {1}<br>Take your time — come back whenever you like.",
+      "grammar.title":       "Grammar",
+      "grammar.intro":       "Tap a lesson to learn · the <b>Quiz</b> button to review.",
+      "grammar.revall":      "Review quiz · all grammar",
+      "grammar.reviewLabel": "Grammar",
+      "grammar.cardsChip":   "{0}/{1} cards",
+      "grammar.phase":       "Lesson {0} · Learn · {1}/{2}",
+      "grammar.lessonQuiz":  "Lesson {0}",
+      "grammar.toQuiz":      "Go to quiz →",
+      "vocab.title":         "Vocabulary",
+      "vocab.intro":         "Tap a deck to browse · mark a word as <b>acquired</b> once you know it. The <b>Quiz</b> button to test yourself.",
+      "vocab.total":         "Total progress: <b>{0} / {1}</b> words acquired",
+      "vocab.wordsCount":    "{0} words",
+      "vocab.wordsAcquired": "{0}/{1} acquired",
+      "vocab.acquis":        "Acquired",
+      "vocab.countInQuran":  "{0}&nbsp;× in the Qur'an",
+      "vocab.phase":         "{0} · {1}/{2}",
+      "stories.title":       "Stories of the Qur'an",
+      "stories.intro":       "Read the story in Arabic. The English is under each line; tap a reference to read and listen to the verse.",
+      "stories.phase":       "{0} · {1}/{2}",
+      "stories.listen":      "▶ Listen",
+      "stories.audioErr":    "⚠ unavailable",
+      "stories.audioOff":    "⚠ offline",
+      "stories.pause":       "⏸ Pause",
+      "stories.analyseTitle":"Analyse the sentence",
+      "quiz.phase":          "{0} · Quiz · {1}/{2}",
+      "quiz.nextQ":          "Next question →",
+      "quiz.seeResult":      "See the result →",
+      "quiz.correct":        "✓ Well spotted! ",
+      "quiz.wrong":          "Not quite. ",
+      "quiz.finishTitle":    "{0} — Quiz",
+      "quiz.perfect":        "Flawless. You've got this.",
+      "quiz.good":           "Good job. One more round and it's perfect.",
+      "quiz.retry":          "Revising is how it sticks. Take another pass — you'll get there.",
+      "quiz.again":          "Retry (new questions)",
+      "quiz.done":           "Finish",
+      "btn.prev":            "‹ Previous",
+      "btn.next":            "Next →",
+      "btn.finish":          "Finish",
+      "theme.toDark":        "Dark theme",
+      "theme.toLight":       "Light theme",
+      "lang.toFR":           "Passer en français",
+      "lang.toEN":           "Switch to English",
+    },
+  };
+  function loadLang() { try { return localStorage.getItem(LANG_KEY) || ""; } catch (_) { return ""; } }
+  function saveLang(v) { try { localStorage.setItem(LANG_KEY, v); } catch (_) {} }
+  function currentLang() {
+    const stored = loadLang();
+    if (stored === "fr" || stored === "en") return stored;
+    return (navigator.language || "en").toLowerCase().indexOf("fr") === 0 ? "fr" : "en";
+  }
+  // Substitute {0}, {1}, ... and the plural marker {p} (empty in FR, "ies" in EN).
+  function t(key) {
+    const args = Array.prototype.slice.call(arguments, 1);
+    const lang = currentLang();
+    let s = (STRINGS[lang] && STRINGS[lang][key]) || (STRINGS.en && STRINGS.en[key]) || key;
+    s = s.replace(/\{(\d+)\}/g, function (_, i) { return String(args[i]); });
+    // Very small plural helper — only useful for the story tile subtitle.
+    // Passes the count as arg[0]; adds "s"/"ies" (fr/en) if count !== 1.
+    if (s.indexOf("{p}") !== -1) {
+      const n = Number(args[0]);
+      const plural = n === 1 ? "" : (lang === "fr" ? "s" : "ies");
+      const single = lang === "fr" ? "" : "y";
+      s = s.replace(/\{p\}/g, n === 1 ? single : plural);
+    }
+    return s;
+  }
+  // For card data fields that come in {fr, en} shape, or just a string.
+  function pickLang(field) {
+    if (field == null) return "";
+    if (typeof field === "string") return field;
+    const lang = currentLang();
+    return field[lang] || field.en || field.fr || "";
+  }
+
   // ---- bidi : isole chaque passage arabe (RTL) pour que le français et les
   //      parenthèses autour restent bien placés ----------------------------
   const AR = "\\u0600-\\u06FF\\u0750-\\u077F\\u08A0-\\u08FF\\uFB50-\\uFDFF\\uFE70-\\uFEFF";
@@ -123,11 +282,13 @@
   // =========================================================================
   //  COQUILLE + NAVIGATION
   // =========================================================================
+  // NAV labels are resolved dynamically via t() at render time so the toggle
+  // can swap them without a page reload.
   const NAV = [
-    { id: "home", label: "Home", icon: "☾" },
-    { id: "grammar", label: "Grammar", icon: "ن" },
-    { id: "vocab", label: "Vocabulary", icon: "ك" },
-    { id: "stories", label: "Stories", icon: "ق" },
+    { id: "home",    key: "nav.home",    icon: "☾" },
+    { id: "grammar", key: "nav.grammar", icon: "ن" },
+    { id: "vocab",   key: "nav.vocab",   icon: "ك" },
+    { id: "stories", key: "nav.stories", icon: "ق" },
   ];
 
   // ---- thème (clair / sombre) --------------------------------------------
@@ -153,28 +314,39 @@
     applyTheme(next);
     return next;
   }
+  function toggleLang() {
+    const next = currentLang() === "fr" ? "en" : "fr";
+    saveLang(next);
+    return next;
+  }
 
   function shell(active, mainHTML) {
     let items = "";
     NAV.forEach(function (it) {
       items += '<button class="nav-item' + (it.id === active ? " active" : "") + '" data-nav="' + it.id + '">' +
                  '<span class="nav-ic" dir="rtl">' + it.icon + "</span>" +
-                 '<span class="nav-lbl">' + it.label + "</span>" +
+                 '<span class="nav-lbl">' + t(it.key) + "</span>" +
                "</button>";
     });
     const isDark = currentTheme() === "dark";
     const themeBtn = '<button class="theme-toggle" id="theme-toggle" ' +
-                       'title="' + (isDark ? "Light theme" : "Dark theme") + '" ' +
-                       'aria-label="' + (isDark ? "Switch to light theme" : "Switch to dark theme") + '">' +
+                       'title="' + (isDark ? t("theme.toLight") : t("theme.toDark")) + '" ' +
+                       'aria-label="' + (isDark ? t("theme.toLight") : t("theme.toDark")) + '">' +
                        (isDark ? SUN_SVG : MOON_SVG) +
                      "</button>";
+    const isFR = currentLang() === "fr";
+    const langBtn = '<button class="lang-toggle" id="lang-toggle" ' +
+                      'title="' + (isFR ? t("lang.toEN") : t("lang.toFR")) + '" ' +
+                      'aria-label="' + (isFR ? t("lang.toEN") : t("lang.toFR")) + '">' +
+                      (isFR ? "EN" : "FR") +
+                    "</button>";
     h(
       '<div class="shell">' +
         '<nav class="rail">' +
           '<div class="brand"><div class="bismillah" dir="rtl">بِسْمِ اللَّه</div>' +
-            '<div class="brand-t">Learn<br>Arabic</div></div>' +
+            '<div class="brand-t">' + t("brand") + "</div></div>" +
           '<div class="nav-items">' + items + "</div>" +
-          '<div class="rail-foot">' + themeBtn + "</div>" +
+          '<div class="rail-foot">' + langBtn + themeBtn + "</div>" +
         "</nav>" +
         '<main class="main"><div class="screen" data-view="' + active + '">' + mainHTML + "</div></main>" +
       "</div>"
@@ -184,10 +356,12 @@
     });
     const tt = document.getElementById("theme-toggle");
     if (tt) tt.onclick = function () { toggleTheme(); go(active); };
+    const lt = document.getElementById("lang-toggle");
+    if (lt) lt.onclick = function () { toggleLang(); go(active); };
   }
 
   function focus(mainHTML, backLabel, onBack) {
-    h('<div class="topbar"><button class="btn btn-ghost" id="back">‹ ' + (backLabel || "Back") + "</button></div>" +
+    h('<div class="topbar"><button class="btn btn-ghost" id="back">‹ ' + (backLabel || t("back")) + "</button></div>" +
       '<div class="focus-wrap">' + mainHTML + "</div>");
     document.getElementById("back").onclick = onBack;
   }
@@ -204,31 +378,31 @@
   // =========================================================================
   function screenHome() {
     const hr = new Date().getHours();
-    const greeting = hr < 18 ? "Ready to learn?" : "A study session tonight?";
+    const greeting = hr < 18 ? t("home.greeting.day") : t("home.greeting.eve");
     const gDone = LESSONS.filter(l => best("g:" + l.id)).length;
 
     shell("home",
       '<div class="home">' +
-        '<h1>Ahlan wa sahlan</h1>' +
+        "<h1>" + t("home.welcome") + "</h1>" +
         '<p class="greeting">' + greeting + "</p>" +
         '<div class="tiles">' +
           '<button class="tile" data-go="grammar">' +
             '<div class="tile-ic" dir="rtl">نَحْو</div>' +
-            '<div class="tile-t">Grammar</div>' +
-            '<div class="tile-s">' + LESSONS.length + " lessons — learn &amp; revise</div>" +
+            '<div class="tile-t">' + t("home.tile.grammar") + "</div>" +
+            '<div class="tile-s">' + t("home.tile.grammar.s", LESSONS.length) + "</div>" +
           "</button>" +
           '<button class="tile" data-go="vocab">' +
             '<div class="tile-ic" dir="rtl">كَلِمَات</div>' +
-            '<div class="tile-t">Vocabulary</div>' +
-            '<div class="tile-s">' + totalVocabAcquired() + " / " + totalVocabWords() + " words acquired</div>" +
+            '<div class="tile-t">' + t("home.tile.vocab") + "</div>" +
+            '<div class="tile-s">' + t("home.tile.vocab.s", totalVocabAcquired(), totalVocabWords()) + "</div>" +
           "</button>" +
           '<button class="tile" data-go="stories">' +
             '<div class="tile-ic" dir="rtl">قَصَص</div>' +
-            '<div class="tile-t">Stories of the Qur\'an</div>' +
-            '<div class="tile-s">' + STORIES.length + " stor" + (STORIES.length > 1 ? "ies" : "y") + " — reading &amp; verses</div>" +
+            '<div class="tile-t">' + t("home.tile.stories") + "</div>" +
+            '<div class="tile-s">' + t("home.tile.stories.s", STORIES.length) + "</div>" +
           "</button>" +
         "</div>" +
-        '<p class="footnote">Grammar: ' + gDone + " / " + LESSONS.length + "<br>Take your time — come back whenever you like.</p>" +
+        '<p class="footnote">' + t("home.footnote", gDone, LESSONS.length) + "</p>" +
       "</div>"
     );
     Array.prototype.forEach.call(document.querySelectorAll(".tile"), function (b) {
@@ -248,26 +422,26 @@
       const total = l.cards.length;
       const pos = Math.min(getPos("g", l.id), total);
       const cardsChip = pos > 0
-        ? '<span class="cards-chip' + (pos >= total ? " done" : "") + '">' + Math.min(pos, total) + "/" + total + " cartes</span>"
+        ? '<span class="cards-chip' + (pos >= total ? " done" : "") + '">' + t("grammar.cardsChip", Math.min(pos, total), total) + "</span>"
         : "";
       rows += '<div class="list-row">' +
                 '<button class="row-main" data-lesson="' + l.id + '">' +
                   '<span class="list-num">' + l.n + "</span>" +
-                  '<span class="list-meta"><span class="list-title" dir="ltr">' + bidi(l.title) + "</span>" +
-                    '<span class="list-sub" dir="ltr">' + bidi(l.subtitle) + " " + cardsChip + "</span></span>" +
+                  '<span class="list-meta"><span class="list-title" dir="ltr">' + bidi(pickLang(l.title)) + "</span>" +
+                    '<span class="list-sub" dir="ltr">' + bidi(pickLang(l.subtitle)) + " " + cardsChip + "</span></span>" +
                 "</button>" +
                 '<button class="row-quiz" data-quiz="' + l.id + '"><span class="rq-label">Quiz</span>' + score + "</button>" +
               "</div>";
     });
     shell("grammar",
-      '<div class="section-head"><h1>Grammaire</h1>' +
-        '<p class="greeting">Touche une leçon pour apprendre · le bouton <b>Quiz</b> pour réviser.</p></div>' +
-      '<button class="btn btn-primary wide" id="revall">Quiz de révision · toute la grammaire</button>' +
+      '<div class="section-head"><h1>' + t("grammar.title") + "</h1>" +
+        '<p class="greeting">' + t("grammar.intro") + "</p></div>" +
+      '<button class="btn btn-primary wide" id="revall">' + t("grammar.revall") + "</button>" +
       '<div class="list">' + rows + "</div>"
     );
     document.getElementById("revall").onclick = function () {
       runQuiz({
-        label: "Grammaire", saveKey: "g:all",
+        label: t("grammar.reviewLabel"), saveKey: "g:all",
         generate: function () { return window.QUIZ.buildGrammarQuiz(10); },
         onExit: screenGrammar,
       });
@@ -288,7 +462,7 @@
 
   function startLessonQuiz(lesson) {
     runQuiz({
-      label: "Leçon " + lesson.n, saveKey: "g:" + lesson.id,
+      label: t("grammar.lessonQuiz", lesson.n), saveKey: "g:" + lesson.id,
       generate: function () { return window.QUIZ.buildLessonQuiz(lesson.id, 10); },
       onExit: screenGrammar,
     });
@@ -306,21 +480,21 @@
 
     focus(
       '<div class="study">' +
-        '<div class="phase-label">Leçon ' + lesson.n + " · Apprentissage · " + (i + 1) + "/" + total + "</div>" +
+        '<div class="phase-label">' + t("grammar.phase", lesson.n, i + 1, total) + "</div>" +
         '<div class="progress"><span style="width:' + pct + '%"></span></div>' +
         '<div class="card concept">' +
-          '<div class="concept-front" dir="ltr">' + bidi(annotate(card.front)) + "</div>" +
+          '<div class="concept-front" dir="ltr">' + bidi(annotate(pickLang(card.front))) + "</div>" +
           '<div class="concept-back">' +
-            '<div class="example-word" dir="ltr">' + bidi(annotate(card.example)).replace(/\s*·\s*/g, "<br>") + "</div>" +
-            '<div class="example-explain" dir="ltr">' + bidi(annotate(card.explain)) + "</div>" +
+            '<div class="example-word" dir="ltr">' + bidi(annotate(pickLang(card.example))).replace(/\s*·\s*/g, "<br>") + "</div>" +
+            '<div class="example-explain" dir="ltr">' + bidi(annotate(pickLang(card.explain))) + "</div>" +
           "</div>" +
         "</div>" +
         '<div class="nav-row">' +
-          (i > 0 ? '<button class="btn btn-ghost" id="prev">‹ Précédent</button>' : '<span class="spacer"></span>') +
-          '<button class="btn btn-primary" id="next">' + (last ? "Passer au quiz →" : "Suivant →") + "</button>" +
+          (i > 0 ? '<button class="btn btn-ghost" id="prev">' + t("btn.prev") + "</button>" : '<span class="spacer"></span>') +
+          '<button class="btn btn-primary" id="next">' + (last ? t("grammar.toQuiz") : t("btn.next")) + "</button>" +
         "</div>" +
       "</div>",
-      "Grammaire", screenGrammar
+      t("grammar.title"), screenGrammar
     );
 
     if (i > 0) document.getElementById("prev").onclick = function () { teach(lesson, i - 1); };
@@ -346,11 +520,11 @@
                 '<button class="row-main" data-deck="' + d.id + '">' +
                   '<span class="list-ic" dir="rtl">كَلِمَات</span>' +
                   '<span class="list-meta">' +
-                    '<span class="list-title">' + d.title + (done ? " ✓" : "") + "</span>" +
-                    '<span class="list-sub">' + d.subtitle + " · " + total + " mots</span>" +
+                    '<span class="list-title">' + pickLang(d.title) + (done ? " ✓" : "") + "</span>" +
+                    '<span class="list-sub">' + pickLang(d.subtitle) + " · " + t("vocab.wordsCount", total) + "</span>" +
                     '<span class="acq-line">' +
                       '<span class="acq-bar"><span class="acq-fill" style="width:' + pct + '%"></span></span>' +
-                      '<span class="acq-count">' + acq + "/" + total + " acquis</span>" +
+                      '<span class="acq-count">' + t("vocab.wordsAcquired", acq, total) + "</span>" +
                     "</span>" +
                   "</span>" +
                 "</button>" +
@@ -360,9 +534,9 @@
     const totalAcq = totalVocabAcquired();
     const totalAll = totalVocabWords();
     shell("vocab",
-      '<div class="section-head"><h1>Vocabulaire</h1>' +
-        '<p class="greeting">Touche un jeu pour parcourir · marque un mot comme <b>acquis</b> quand tu le connais. Bouton <b>Quiz</b> pour te tester.</p></div>' +
-      '<div class="vocab-total">Progression totale : <b>' + totalAcq + " / " + totalAll + "</b> mots acquis</div>" +
+      '<div class="section-head"><h1>' + t("vocab.title") + "</h1>" +
+        '<p class="greeting">' + t("vocab.intro") + "</p></div>" +
+      '<div class="vocab-total">' + t("vocab.total", totalAcq, totalAll) + "</div>" +
       '<div class="list">' + rows + "</div>"
     );
     Array.prototype.forEach.call(document.querySelectorAll(".row-main"), function (b) {
@@ -375,7 +549,7 @@
       b.onclick = function () {
         const d = VOCAB.filter(x => x.id === b.getAttribute("data-quiz"))[0];
         if (d) runQuiz({
-          label: d.title, saveKey: "v:" + d.id,
+          label: pickLang(d.title), saveKey: "v:" + d.id,
           generate: function () { return window.QUIZ.buildVocabQuiz(d.id, 10); },
           onExit: screenVocab,
         });
@@ -395,18 +569,18 @@
 
     const acquired = isAcquired(deck.id, w.ar);
     const countChip = (typeof w.count === "number")
-      ? '<div class="vcard-count">' + w.count + "&nbsp;× dans le Coran</div>"
+      ? '<div class="vcard-count">' + t("vocab.countInQuran", w.count) + "</div>"
       : "";
 
     focus(
       '<div class="study">' +
-        '<div class="phase-label">' + deck.title + " · " + (i + 1) + "/" + total + "</div>" +
+        '<div class="phase-label">' + t("vocab.phase", pickLang(deck.title), i + 1, total) + "</div>" +
         '<div class="progress"><span style="width:' + pct + '%"></span></div>' +
         '<div class="card vcard">' +
           '<div class="vcard-ar" dir="rtl">' + w.ar + "</div>" +
           '<div class="vcard-back">' +
             '<div class="vcard-tr">' + w.tr + "</div>" +
-            '<div class="vcard-fr">' + w.fr + "</div>" +
+            '<div class="vcard-fr">' + pickLang(w.fr) + "</div>" +
             countChip +
           "</div>" +
         "</div>" +
@@ -414,15 +588,15 @@
           '<button class="acq-toggle' + (acquired ? " on" : "") + '" id="acq" ' +
             'aria-pressed="' + (acquired ? "true" : "false") + '">' +
             '<span class="acq-check">✓</span> ' +
-            '<span class="acq-label">Acquis</span>' +
+            '<span class="acq-label">' + t("vocab.acquis") + "</span>" +
           "</button>" +
         "</div>" +
         '<div class="nav-row">' +
-          (i > 0 ? '<button class="btn btn-ghost" id="prev">‹ Précédent</button>' : '<span class="spacer"></span>') +
-          '<button class="btn btn-primary" id="next">' + (last ? "Terminer" : "Suivant →") + "</button>" +
+          (i > 0 ? '<button class="btn btn-ghost" id="prev">' + t("btn.prev") + "</button>" : '<span class="spacer"></span>') +
+          '<button class="btn btn-primary" id="next">' + (last ? t("btn.finish") : t("btn.next")) + "</button>" +
         "</div>" +
       "</div>",
-      "Vocabulaire", screenVocab
+      t("vocab.title"), screenVocab
     );
 
     if (i > 0) document.getElementById("prev").onclick = function () { browse(deck, i - 1); };
@@ -445,33 +619,36 @@
   let audioEl = null, audioBtn = null;
   function stopAudio() {
     if (audioEl) { audioEl.pause(); audioEl = null; }
-    if (audioBtn) { audioBtn.classList.remove("playing"); audioBtn.innerHTML = "▶ Écouter"; audioBtn = null; }
+    if (audioBtn) { audioBtn.classList.remove("playing"); audioBtn.innerHTML = t("stories.listen"); audioBtn = null; }
   }
   function playAudio(url, btn) {
     if (audioEl && audioBtn === btn) { stopAudio(); return; }
     stopAudio();
     audioEl = new Audio(url); audioBtn = btn;
-    btn.classList.add("playing"); btn.innerHTML = "⏸ Pause";
+    btn.classList.add("playing"); btn.innerHTML = t("stories.pause");
     audioEl.onended = stopAudio;
-    audioEl.onerror = function () { btn.innerHTML = "⚠ indisponible"; };
-    audioEl.play().catch(function () { btn.innerHTML = "⚠ hors-ligne"; });
+    audioEl.onerror = function () { btn.innerHTML = t("stories.audioErr"); };
+    audioEl.play().catch(function () { btn.innerHTML = t("stories.audioOff"); });
   }
 
   function screenStories() {
     stopAudio();
     let rows = "";
     STORIES.forEach(function (s) {
+      // Backward-compat: legacy `titleFr` (string) alongside modern `title` (bilingual object).
+      const title = pickLang(s.title);
+      const titleLatin = pickLang(s.titleFr || s.titleLatin || s.titleEn);
+      const subtitle = pickLang(s.subtitle);
       rows += '<div class="list-row"><button class="row-main" data-story="' + s.id + '">' +
                 '<span class="list-ic" dir="rtl">ق</span>' +
                 '<span class="list-meta">' +
-                  '<span class="list-title" dir="rtl">' + s.title + "</span>" +
-                  '<span class="list-sub">' + s.titleFr + " — " + s.subtitle + "</span>" +
+                  '<span class="list-title" dir="rtl">' + title + "</span>" +
+                  '<span class="list-sub">' + titleLatin + " — " + subtitle + "</span>" +
                 "</span></button></div>";
     });
     shell("stories",
-      '<div class="section-head"><h1>Les récits du Coran</h1>' +
-        '<p class="greeting">Lis l\'histoire en arabe. Le français est sous chaque ligne ; ' +
-        "touche une référence pour lire et écouter le verset.</p></div>" +
+      '<div class="section-head"><h1>' + t("stories.title") + "</h1>" +
+        '<p class="greeting">' + t("stories.intro") + "</p></div>" +
       '<div class="list">' + rows + "</div>"
     );
     Array.prototype.forEach.call(document.querySelectorAll(".row-main"), function (b) {
@@ -491,7 +668,10 @@
 
     const LOUPE = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" ' +
       'stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>';
-    const TYPE = { nom: "اسم · nom", verbe: "فعل · verbe", particule: "حرف · particule", pronom: "ضمير · pronom" };
+    const lang = currentLang();
+    const TYPE_FR = { nom: "اسم · nom", verbe: "فعل · verbe", particule: "حرف · particule", pronom: "ضمير · pronom" };
+    const TYPE_EN = { nom: "اسم · noun", verbe: "فعل · verb", particule: "حرف · particle", pronom: "ضمير · pronoun" };
+    const TYPE = lang === "fr" ? TYPE_FR : TYPE_EN;
     function renderAn(an) {
       let w = "";
       an.words.forEach(function (wd) {
@@ -499,25 +679,27 @@
                '<span class="aw-word" dir="rtl">' + wd.w + "</span>" +
                '<span class="aw-body">' +
                  '<span class="aw-type t-' + wd.type + '" dir="rtl">' + (TYPE[wd.type] || wd.type) + "</span>" +
-                 '<span class="aw-role" dir="ltr">' + wd.role + "</span>" +
+                 '<span class="aw-role" dir="ltr">' + pickLang(wd.role) + "</span>" +
                "</span>" +
              "</div>";
       });
       return '<div class="analyse-words">' + w + "</div>" +
-             '<div class="analyse-take">' + an.takeaway + "</div>";
+             '<div class="analyse-take">' + pickLang(an.takeaway) + "</div>";
     }
 
-    // chaque phrase : arabe, français grisé, et son propre bouton d'analyse
+    // chaque phrase : arabe, sens grisé, et son propre bouton d'analyse
+    // card.fr may be an array of strings (FR only) OR an array of {fr, en} objects.
     let lines = "";
     card.ar.forEach(function (a, idx) {
+      const glossField = (card.fr && card.fr[idx]) || (card.gloss && card.gloss[idx]) || "";
       lines += '<div class="story-line">' +
         '<p class="story-ar" dir="rtl">' + a + "</p>" +
-        '<p class="story-fr">' + (card.fr[idx] || "") + "</p>";
+        '<p class="story-fr">' + pickLang(glossField) + "</p>";
       if (card.an && card.an[idx]) {
         lines += '<button class="loupe-btn" data-target="an-' + idx + '" ' +
-                   'title="Analyser la phrase" aria-label="Analyser la phrase">' + LOUPE + "</button>" +
+                   'title="' + t("stories.analyseTitle") + '" aria-label="' + t("stories.analyseTitle") + '">' + LOUPE + "</button>" +
                  '<div class="analyse-panel" id="an-' + idx + '" hidden>' +
-                   '<div class="analyse-head">Analyser la phrase</div>' + renderAn(card.an[idx]) +
+                   '<div class="analyse-head">' + t("stories.analyseTitle") + "</div>" + renderAn(card.an[idx]) +
                  "</div>";
       }
       lines += "</div>";
@@ -528,35 +710,40 @@
       const v = VERSES[ref];
       if (!v) return;
       const pid = "panel-" + ref.replace(":", "-");
+      // Verses may carry `.fr` (legacy) alongside `.en` once fetched bilingually.
+      const trans = lang === "en" ? (v.en || v.fr) : (v.fr || v.en);
+      const nameField = pickLang(v.frName || v.name) || v.frName || "";
       refsHtml +=
         '<div class="verse-block">' +
           '<button class="verse-chip" data-ref="' + ref + '">' +
-            '<span class="q-ic" dir="rtl">۩</span> ' + v.frName + " " + ref +
+            '<span class="q-ic" dir="rtl">۩</span> ' + nameField + " " + ref +
           "</button>" +
           '<div class="verse-panel" id="' + pid + '" hidden>' +
             '<div class="verse-ar" dir="rtl">' + v.ar + "</div>" +
-            '<div class="verse-fr">' + v.fr + "</div>" +
+            '<div class="verse-fr">' + trans + "</div>" +
             '<div class="verse-foot">' +
               '<span class="verse-src" dir="rtl">' + v.surah + " · " + v.ayah + "</span>" +
-              '<button class="btn-listen" data-audio="' + v.audio + '">▶ Écouter</button>' +
+              '<button class="btn-listen" data-audio="' + v.audio + '">' + t("stories.listen") + "</button>" +
             "</div>" +
           "</div>" +
         "</div>";
     });
 
+    const storyTitleLatin = pickLang(story.titleFr || story.titleLatin || story.titleEn);
+
     focus(
       '<div class="study story">' +
-        '<div class="phase-label">' + story.titleFr + " · " + (i + 1) + "/" + total + "</div>" +
+        '<div class="phase-label">' + t("stories.phase", storyTitleLatin, i + 1, total) + "</div>" +
         '<div class="progress"><span style="width:' + pct + '%"></span></div>' +
         '<div class="card story-card">' + lines +
           (refsHtml ? '<div class="verse-refs">' + refsHtml + "</div>" : "") +
         "</div>" +
         '<div class="nav-row">' +
-          (i > 0 ? '<button class="btn btn-ghost" id="prev">‹ Précédent</button>' : '<span class="spacer"></span>') +
-          '<button class="btn btn-primary" id="next">' + (last ? "Terminer" : "Suivant →") + "</button>" +
+          (i > 0 ? '<button class="btn btn-ghost" id="prev">' + t("btn.prev") + "</button>" : '<span class="spacer"></span>') +
+          '<button class="btn btn-primary" id="next">' + (last ? t("btn.finish") : t("btn.next")) + "</button>" +
         "</div>" +
       "</div>",
-      "Récits", function () { stopAudio(); screenStories(); }
+      t("nav.stories"), function () { stopAudio(); screenStories(); }
     );
 
     if (i > 0) document.getElementById("prev").onclick = function () { readStory(story, i - 1); };
@@ -601,18 +788,18 @@
       }));
       let optsHtml = "";
       opts.forEach(function (o) {
-        optsHtml += '<button class="opt" data-correct="' + o.correct + '" dir="ltr">' + bidi(o.text) + "</button>";
+        optsHtml += '<button class="opt" data-correct="' + o.correct + '" dir="ltr">' + bidi(pickLang(o.text)) + "</button>";
       });
 
       focus(
         '<div class="study">' +
-          '<div class="phase-label">' + cfg.label + " · Quiz · " + (i + 1) + "/" + total + "</div>" +
+          '<div class="phase-label">' + t("quiz.phase", cfg.label, i + 1, total) + "</div>" +
           '<div class="progress"><span style="width:' + pct + '%"></span></div>' +
-          '<div class="question" dir="ltr">' + bidi(item.q) + "</div>" +
+          '<div class="question" dir="ltr">' + bidi(pickLang(item.q)) + "</div>" +
           '<div class="options">' + optsHtml + "</div>" +
           '<div class="feedback" id="feedback" hidden></div>' +
           '<div class="nav-row center"><button class="btn btn-primary" id="next" hidden>' +
-            (i === total - 1 ? "Voir le résultat →" : "Question suivante →") + "</button></div>" +
+            (i === total - 1 ? t("quiz.seeResult") : t("quiz.nextQ")) + "</button></div>" +
         "</div>",
         cfg.label, cfg.onExit
       );
@@ -631,7 +818,7 @@
           const fb = document.getElementById("feedback");
           fb.hidden = false;
           fb.className = "feedback " + (wasCorrect ? "ok" : "no");
-          fb.innerHTML = (wasCorrect ? "✓ Bien vu ! " : "Pas tout à fait. ") + bidi(item.explain);
+          fb.innerHTML = (wasCorrect ? t("quiz.correct") : t("quiz.wrong")) + bidi(pickLang(item.explain));
           document.getElementById("next").hidden = false;
         };
       });
@@ -645,17 +832,17 @@
       recordScore(cfg.saveKey, score, total);
       const ratio = score / total;
       const arabic = ratio === 1 ? "ما شاء الله" : ratio >= 0.6 ? "أَحْسَنْتِ" : "وَاصِلِي";
-      const msg = ratio === 1 ? "Sans faute. Tu maîtrises."
-                : ratio >= 0.6 ? "Très bien. Encore un tour et ce sera parfait."
-                : "C'est en révisant qu'on retient. Reprends tranquillement — tu vas y arriver.";
+      const msg = ratio === 1 ? t("quiz.perfect")
+                : ratio >= 0.6 ? t("quiz.good")
+                : t("quiz.retry");
       focus(
         '<div class="celebrate">' +
           '<div class="mashallah" dir="rtl">' + arabic + "</div>" +
           '<div class="score-big">' + score + "<span>/" + total + "</span></div>" +
           "<p>" + msg + "</p>" +
           '<div class="result-actions">' +
-            '<button class="btn btn-primary" id="again">Refaire (nouvelles questions)</button>' +
-            '<button class="btn btn-ghost" id="done">Terminer</button>' +
+            '<button class="btn btn-primary" id="again">' + t("quiz.again") + "</button>" +
+            '<button class="btn btn-ghost" id="done">' + t("quiz.done") + "</button>" +
           "</div>" +
         "</div>",
         cfg.label, cfg.onExit

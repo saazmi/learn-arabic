@@ -1529,20 +1529,24 @@ html[data-theme="dark"] .analyse-panel { background: rgba(60, 50, 35, 0.55); }
 html[data-theme="dark"] .row-main:hover { background: rgba(255, 245, 220, 0.06); }
 html[data-theme="dark"] .row-main:active { background: rgba(255, 245, 220, 0.10); }
 
-/* Sun/moon toggle at the bottom of the nav rail. */
-.rail-foot { margin-top: auto; display: flex; justify-content: center; padding-top: 0.6rem; }
-.theme-toggle {
+/* Language + sun/moon toggles at the bottom of the nav rail. */
+.rail-foot { margin-top: auto; display: flex; justify-content: center; gap: 0.5rem; padding-top: 0.6rem; }
+.theme-toggle,
+.lang-toggle {
   display: inline-flex; align-items: center; justify-content: center;
   width: 2.4rem; height: 2.4rem; border-radius: 50%;
   background: transparent; border: 1px solid rgba(139, 122, 92, 0.28);
   color: var(--ink-soft); cursor: pointer;
+  font-family: var(--font); font-size: 0.85rem; font-weight: 700;
   transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
-.theme-toggle:hover { color: var(--ink); background: rgba(139, 122, 92, 0.08); }
-.theme-toggle:active { transform: scale(0.94); }
+.theme-toggle:hover,
+.lang-toggle:hover { color: var(--ink); background: rgba(139, 122, 92, 0.08); }
+.theme-toggle:active,
+.lang-toggle:active { transform: scale(0.94); }
 
 @media (max-width: 720px) {
-  /* On narrow screens the rail is a bottom bar — tuck the toggle inline. */
+  /* On narrow screens the rail is a bottom bar — tuck the toggles inline. */
   .rail-foot { margin-top: 0; padding-top: 0; padding-left: 0.4rem; }
-  .theme-toggle { width: 2rem; height: 2rem; }
+  .theme-toggle, .lang-toggle { width: 2rem; height: 2rem; font-size: 0.75rem; }
 }
