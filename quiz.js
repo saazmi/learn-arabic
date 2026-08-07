@@ -152,7 +152,7 @@
   // =========================================================================
   const T = {
     type: {
-      lessons: ["g1"], maxPerQuiz: 3,
+      lessons: ["g1"], maxPerQuiz: 4,
       make: function () {
         const bag = NOUNS.map(w => ({ w: w, t: 0 }))
           .concat(VERBS.map(w => ({ w: w, t: 1 })))
@@ -210,7 +210,7 @@
     },
 
     solar: {
-      lessons: ["g1"], maxPerQuiz: 2,
+      lessons: ["g1"], maxPerQuiz: 3,
       make: function () {
         const w = rand(NOUNS);
         const solar = isSolar(w);
@@ -559,8 +559,44 @@
       },
     },
 
+    nominal_parts: {
+      lessons: ["g2"], maxPerQuiz: 1,
+      make: function () {
+        // Une phrase nominale explicite : الـ + nom défini · adjectif indéfini.
+        // On demande d'identifier soit le مبتدأ, soit le خبر.
+        const w = rand(NOUNS.filter(x => !endsTaa(x)));
+        const adj = rand([
+          { ar: "جَدِيدٌ",  fr: "neuf",     en: "new" },
+          { ar: "كَبِيرٌ",  fr: "grand",    en: "big" },
+          { ar: "قَرِيبٌ",  fr: "proche",   en: "near" },
+          { ar: "صَغِيرٌ",  fr: "petit",    en: "small" },
+        ]);
+        const subj = "ال" + w.ar.replace(/^ال/, "") + "ُ";
+        const phrase = subj + " " + adj.ar;
+        const askKhabar = Math.random() < 0.5;
+        return {
+          q: L("Dans « " + phrase + " » (« " + frLe(w) + " est " + adj.fr + " »), quel mot est le " +
+                 (askKhabar ? "خَبَر" : "مُبْتَدَأ") + " ?",
+               "In '" + phrase + "' ('the " + w.en + " is " + adj.en + "'), which word is the " +
+                 (askKhabar ? "khabar" : "mubtadaʾ") + "?"),
+          options: [L(subj + " (défini)",     subj + " (definite)"),
+                    L(adj.ar + " (indéfini)", adj.ar + " (indefinite)")],
+          // subj = مبتدأ (index 0), adj = خبر (index 1)
+          answer: askKhabar ? 1 : 0,
+          explain: L(
+            askKhabar
+              ? "Le خَبَر est ce qu'on dit du sujet — ici l'adjectif " + adj.ar + " (indéfini, tanwin)."
+              : "Le مُبْتَدَأ est le sujet — souvent défini (الـ), ici " + subj + ".",
+            askKhabar
+              ? "The khabar is what's said about the subject — here the adjective " + adj.ar + " (indefinite, tanwīn)."
+              : "The mubtadaʾ is the subject — usually definite (الـ), here " + subj + "."
+          ),
+        };
+      },
+    },
+
     idafa_muda_af: {
-      lessons: ["g2"], maxPerQuiz: 2,
+      lessons: ["g2"], maxPerQuiz: 3,
       make: function () {
         // On construit une إضافة « X du Y » ; on demande soit le مُضَاف
         // (1er mot), soit le مُضَاف إِلَيْه (2e mot), tiré au hasard.
