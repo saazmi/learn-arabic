@@ -619,7 +619,10 @@
       make: function () {
         // Une phrase nominale explicite : الـ + nom défini · adjectif indéfini.
         // On demande d'identifier soit le مبتدأ, soit le خبر.
-        const w = rand(NOUNS.filter(x => !endsTaa(x)));
+        // Filtre : nom masculin en arabe ET en français, pour que l'adjectif
+        // reste au masculin dans les deux langues (ex. « le livre est neuf »).
+        // Exclut aussi ة (marquerait le féminin arabe).
+        const w = rand(NOUNS.filter(x => x.g === "m" && x.fg === "m" && !endsTaa(x)));
         const adj = rand([
           { ar: "جَدِيدٌ",  fr: "neuf",     en: "new" },
           { ar: "كَبِيرٌ",  fr: "grand",    en: "big" },
