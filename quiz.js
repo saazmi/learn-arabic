@@ -334,15 +334,18 @@
         return {
           q: L("Au cas " + targetCase + ", le pluriel masculin sain de " + w.ar + " (« " + w.fr + " ») se termine par…",
                "In the " + enCase + " case, the sound masculine plural of " + w.ar + " ('" + w.en + "') ends in…"),
-          options: [L("ـُونَ", "ـُونَ"), L("ـِينَ", "ـِينَ"), L("ـَات", "ـَات")],
+          // Options SANS harakat initial : sinon la voyelle prime le cas
+          // (damma → رَفْع, kasra → جَرّ, fatha → نَصْب) et il suffit de
+          // pattern-matcher au lieu de connaître la règle « wāw vs yāʾ ».
+          options: [L("ـون", "ـون"), L("ـين", "ـين"), L("ـات", "ـات")],
           answer: isRafa ? 0 : 1,
           explain: L(
             isRafa
-              ? "Au cas رَفْع → ـُونَ. Aux cas نَصْب / جَرّ ce serait ـِينَ."
-              : "Aux cas نَصْب et جَرّ → ـِينَ. Au cas رَفْع ce serait ـُونَ.",
+              ? "Au cas رَفْع → ـُونَ (wāw). Aux cas نَصْب et جَرّ ce serait ـِينَ (yāʾ)."
+              : "Aux cas نَصْب et جَرّ → ـِينَ (yāʾ). Au cas رَفْع ce serait ـُونَ (wāw).",
             isRafa
-              ? "In rafʿ → ـُونَ. In naṣb / jarr it would be ـِينَ."
-              : "In naṣb and jarr → ـِينَ. In rafʿ it would be ـُونَ."
+              ? "In rafʿ → ـُونَ (wāw). In naṣb / jarr it would be ـِينَ (yāʾ)."
+              : "In naṣb and jarr → ـِينَ (yāʾ). In rafʿ it would be ـُونَ (wāw)."
           ),
         };
       },
