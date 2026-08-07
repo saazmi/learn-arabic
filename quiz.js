@@ -8,7 +8,8 @@
      buildLessonQuiz(lessonId, n)  → questions pour une leçon de grammaire
      buildGrammarQuiz(n)           → révision de TOUTE la grammaire
      buildVocabQuiz(deckId, n)     → quiz d'un jeu de vocabulaire
-   Chaque question : { q, options:[texte…], answer:index, explain }
+   Chaque question : { q:{fr,en}, options:[{fr,en}…], answer:index, explain:{fr,en} }
+   Champs texte bilingues — l'UI (pickLang) choisit la langue.
    ========================================================================= */
 
 (function () {
@@ -24,76 +25,74 @@
     }
     return a;
   }
-  // tire n éléments distincts
   function sample(a, n) { return shuffle(a).slice(0, n); }
 
-  // ---- POOLS de mots (pour la grammaire) --------------------------------
-  //   pl     : forme plurielle réelle et vérifiée
-  //   plType : "broken" (jamʿ taksīr, à mémoriser) | "sound-f" (retire ة + ات)
-  //            (aucun nom masculin de ce pool ne prend un pluriel masculin sain
-  //             — voir PLURAL_M plus bas pour les mots qui le prennent)
+  // Emballe deux chaînes fr/en. Si en est absent, on retombe sur fr.
+  function L(fr, en) { return { fr: fr, en: en == null ? fr : en }; }
+
+  // ---- POOLS de mots (bilingues) ----------------------------------------
+  //   fr/en   : gloses des deux langues
+  //   pl      : forme plurielle réelle et vérifiée
+  //   plType  : "broken" (jamʿ taksīr) | "sound-f" (retire ة + ات)
   const NOUNS = [
-    { ar: "كِتَاب",    fr: "livre",   g: "m", pl: "كُتُب",       plType: "broken" },
-    { ar: "رَجُل",     fr: "homme",   g: "m", pl: "رِجَال",      plType: "broken" },
-    { ar: "بَيْت",     fr: "maison",  g: "m", pl: "بُيُوت",      plType: "broken" },
-    { ar: "قَمَر",     fr: "lune",    g: "m", pl: "أَقْمَار",    plType: "broken" },
-    { ar: "قَلَم",     fr: "stylo",   g: "m", pl: "أَقْلَام",    plType: "broken" },
-    { ar: "بَاب",      fr: "porte",   g: "m", pl: "أَبْوَاب",    plType: "broken" },
-    { ar: "وَلَد",     fr: "garçon",  g: "m", pl: "أَوْلَاد",    plType: "broken" },
-    { ar: "مَدْرَسَة", fr: "école",   g: "f", pl: "مَدَارِس",    plType: "broken" },
-    { ar: "شَجَرَة",   fr: "arbre",   g: "f", pl: "أَشْجَار",    plType: "broken" },
-    { ar: "سَيَّارَة", fr: "voiture", g: "f", pl: "سَيَّارَات",  plType: "sound-f" },
-    { ar: "شَمْس",     fr: "soleil",  g: "f", pl: "شُمُوس",      plType: "broken" },
-    { ar: "أَرْض",     fr: "terre",   g: "f", pl: "أَرَاضٍ",     plType: "broken" },
-    { ar: "يَد",       fr: "main",    g: "f", pl: "أَيْدٍ",      plType: "broken" },
+    { ar: "كِتَاب",    fr: "livre",   en: "book",   g: "m", pl: "كُتُب",       plType: "broken" },
+    { ar: "رَجُل",     fr: "homme",   en: "man",    g: "m", pl: "رِجَال",      plType: "broken" },
+    { ar: "بَيْت",     fr: "maison",  en: "house",  g: "m", pl: "بُيُوت",      plType: "broken" },
+    { ar: "قَمَر",     fr: "lune",    en: "moon",   g: "m", pl: "أَقْمَار",    plType: "broken" },
+    { ar: "قَلَم",     fr: "stylo",   en: "pen",    g: "m", pl: "أَقْلَام",    plType: "broken" },
+    { ar: "بَاب",      fr: "porte",   en: "door",   g: "m", pl: "أَبْوَاب",    plType: "broken" },
+    { ar: "وَلَد",     fr: "garçon",  en: "boy",    g: "m", pl: "أَوْلَاد",    plType: "broken" },
+    { ar: "مَدْرَسَة", fr: "école",   en: "school", g: "f", pl: "مَدَارِس",    plType: "broken" },
+    { ar: "شَجَرَة",   fr: "arbre",   en: "tree",   g: "f", pl: "أَشْجَار",    plType: "broken" },
+    { ar: "سَيَّارَة", fr: "voiture", en: "car",    g: "f", pl: "سَيَّارَات",  plType: "sound-f" },
+    { ar: "شَمْس",     fr: "soleil",  en: "sun",    g: "f", pl: "شُمُوس",      plType: "broken" },
+    { ar: "أَرْض",     fr: "terre",   en: "earth",  g: "f", pl: "أَرَاضٍ",     plType: "broken" },
+    { ar: "يَد",       fr: "main",    en: "hand",   g: "f", pl: "أَيْدٍ",      plType: "broken" },
   ];
   const VERBS = [
-    { ar: "خَلَقَ", fr: "il a créé" },
-    { ar: "قَالَ", fr: "il a dit" },
-    { ar: "ذَهَبَ", fr: "il est allé" },
-    { ar: "عَلِمَ", fr: "il a su" },
-    { ar: "كَتَبَ", fr: "il a écrit" },
-    { ar: "سَمِعَ", fr: "il a entendu" },
-    { ar: "نَصَرَ", fr: "il a secouru" },
+    { ar: "خَلَقَ", fr: "il a créé",     en: "he created" },
+    { ar: "قَالَ", fr: "il a dit",       en: "he said" },
+    { ar: "ذَهَبَ", fr: "il est allé",   en: "he went" },
+    { ar: "عَلِمَ", fr: "il a su",       en: "he knew" },
+    { ar: "كَتَبَ", fr: "il a écrit",    en: "he wrote" },
+    { ar: "سَمِعَ", fr: "il a entendu",  en: "he heard" },
+    { ar: "نَصَرَ", fr: "il a secouru",  en: "he helped" },
   ];
   const PARTICLES = [
-    { ar: "فِي", fr: "dans" },
-    { ar: "مِنْ", fr: "de, depuis" },
-    { ar: "إِلَى", fr: "vers" },
-    { ar: "عَلَى", fr: "sur" },
-    { ar: "وَ", fr: "et" },
-    { ar: "هَلْ", fr: "est-ce que" },
+    { ar: "فِي",   fr: "dans",         en: "in" },
+    { ar: "مِنْ",  fr: "de, depuis",   en: "from" },
+    { ar: "إِلَى", fr: "vers",         en: "toward" },
+    { ar: "عَلَى", fr: "sur",          en: "on, upon" },
+    { ar: "وَ",    fr: "et",           en: "and" },
+    { ar: "هَلْ",  fr: "est-ce que",   en: "(question particle)" },
   ];
   const PLURAL_M = [
-    { ar: "مُسْلِم", fr: "musulman" },
-    { ar: "مُؤْمِن", fr: "croyant" },
-    { ar: "طَالِب", fr: "étudiant" },
-    { ar: "كَافِر", fr: "mécréant" },
+    { ar: "مُسْلِم", fr: "musulman",   en: "Muslim" },
+    { ar: "مُؤْمِن", fr: "croyant",    en: "believer" },
+    { ar: "طَالِب",  fr: "étudiant",   en: "student" },
+    { ar: "كَافِر",  fr: "mécréant",   en: "disbeliever" },
   ];
   // pluriels de choses (non-humains) — pour la règle d'accord au féminin singulier
   const NONHUMAN = [
-    { pl: "كُتُب", fr: "livres" },
-    { pl: "بُيُوت", fr: "maisons" },
-    { pl: "أَقْلَام", fr: "stylos" },
-    { pl: "أَيَّام", fr: "jours" },
-    { pl: "أَبْوَاب", fr: "portes" },
+    { pl: "كُتُب",    fr: "livres",  en: "books" },
+    { pl: "بُيُوت",   fr: "maisons", en: "houses" },
+    { pl: "أَقْلَام", fr: "stylos",  en: "pens" },
+    { pl: "أَيَّام",  fr: "jours",   en: "days" },
+    { pl: "أَبْوَاب", fr: "portes",  en: "doors" },
   ];
 
   // lettres solaires (le ل de الـ ne se prononce pas)
   const SOLAR = "تثدذرزسشصضطظلن";
   function isSolar(word) { return SOLAR.indexOf(word.ar.charAt(0)) !== -1; }
   function endsTaa(w) { return /ة$/.test(w.ar); }
-  // ce que donnerait la RÈGLE sain-féminin (retire ة, ajoute ات) — utile
-  // pour fabriquer un mauvais distracteur quand le pluriel réel est brisé.
-  // NB : les mots du pool finissant par ة portent déjà une fatha avant la
-  // ة ; on n'en rajoute pas, sinon on aurait deux fathas empilées.
+  // NB : les mots du pool finissant par ة portent déjà une fatha ; on n'en
+  // rajoute pas, sinon on aurait deux fathas empilées.
   function soundFPlural(w) { return w.ar.replace(/ة$/, "") + "ات"; }
-  // ce que donnerait la RÈGLE sain-masculin (ون) — deuxième distracteur.
   function soundMPlural(w) { return w.ar.replace(/ة$/, "") + "ون"; }
 
   // =========================================================================
   //  GABARITS DE GRAMMAIRE — chacun tagué par leçon(s)
-  //  make() renvoie une question { q, options, answer, explain }
+  //  make() renvoie une question { q, options, answer, explain } bilingue.
   // =========================================================================
   const T = {
     type: {
@@ -103,14 +102,20 @@
           .concat(VERBS.map(w => ({ w: w, t: 1 })))
           .concat(PARTICLES.map(w => ({ w: w, t: 2 })));
         const p = rand(bag);
-        const why = ["Une personne / une chose → un اِسْم (nom).",
-                     "Une action → un فِعْل (verbe).",
-                     "Un mot-outil invariable → un حَرْف (particule)."][p.t];
+        const whyFr = ["Une personne / une chose → un اِسْم (nom).",
+                       "Une action → un فِعْل (verbe).",
+                       "Un mot-outil invariable → un حَرْف (particule)."][p.t];
+        const whyEn = ["A person / a thing → a اِسْم (noun).",
+                       "An action → a فِعْل (verb).",
+                       "An invariable function-word → a حَرْف (particle)."][p.t];
         return {
-          q: "Quel type de mot est " + p.w.ar + " (" + p.w.fr + ") ?",
-          options: ["اِسْم — nom", "فِعْل — verbe", "حَرْف — particule"],
+          q: L("Quel type de mot est " + p.w.ar + " (" + p.w.fr + ") ?",
+               "What kind of word is " + p.w.ar + " (" + p.w.en + ")?"),
+          options: [L("اِسْم — nom", "اِسْم — noun"),
+                    L("فِعْل — verbe", "فِعْل — verb"),
+                    L("حَرْف — particule", "حَرْف — particle")],
           answer: p.t,
-          explain: why,
+          explain: L(whyFr, whyEn),
         };
       },
     },
@@ -120,10 +125,13 @@
       make: function () {
         const w = rand(NOUNS);
         return {
-          q: "Le mot " + w.ar + "ٌ (avec tanwin) est…",
-          options: ["indéfini (نَكِرَة)", "défini (مَعْرِفَة)"],
+          q: L("Le mot " + w.ar + "ٌ (avec tanwin) est…",
+               "The word " + w.ar + "ٌ (with tanwīn) is…"),
+          options: [L("indéfini (نَكِرَة)", "indefinite (نَكِرَة)"),
+                    L("défini (مَعْرِفَة)", "definite (مَعْرِفَة)")],
           answer: 0,
-          explain: "Le tanwin (ـٌ ـً ـٍ) est la marque de l'indéfini.",
+          explain: L("Le tanwin (ـٌ ـً ـٍ) est la marque de l'indéfini.",
+                     "The tanwīn (ـٌ ـً ـٍ) is the mark of the indefinite."),
         };
       },
     },
@@ -133,10 +141,14 @@
       make: function () {
         const w = rand(NOUNS);
         return {
-          q: "Pour rendre " + w.ar + " (" + w.fr + ") défini, on ajoute…",
-          options: ["الـ au début", "un tanwin", "une chadda"],
+          q: L("Pour rendre " + w.ar + " (" + w.fr + ") défini, on ajoute…",
+               "To make " + w.ar + " (" + w.en + ") definite, you add…"),
+          options: [L("الـ au début", "الـ at the start"),
+                    L("un tanwin", "a tanwīn"),
+                    L("une chadda", "a shadda")],
           answer: 0,
-          explain: "الـ rend le mot défini — et le tanwin disparaît alors.",
+          explain: L("الـ rend le mot défini — et le tanwin disparaît alors.",
+                     "الـ makes the word definite — and the tanwīn then drops."),
         };
       },
     },
@@ -147,12 +159,16 @@
         const w = rand(NOUNS);
         const solar = isSolar(w);
         return {
-          q: "Dans الـ + " + w.ar + " (" + w.fr + "), prononce-t-on le ل ?",
-          options: ["Oui — lettre lunaire", "Non — lettre solaire"],
+          q: L("Dans الـ + " + w.ar + " (" + w.fr + "), prononce-t-on le ل ?",
+               "In الـ + " + w.ar + " (" + w.en + "), is the ل pronounced?"),
+          options: [L("Oui — lettre lunaire", "Yes — moon letter"),
+                    L("Non — lettre solaire", "No — sun letter")],
           answer: solar ? 1 : 0,
-          explain: solar
-            ? w.ar + " commence par une lettre solaire : le ل est muet (chadda)."
-            : w.ar + " commence par une lettre lunaire : le ل se prononce.",
+          explain: L(
+            solar ? w.ar + " commence par une lettre solaire : le ل est muet (chadda)."
+                  : w.ar + " commence par une lettre lunaire : le ل se prononce.",
+            solar ? w.ar + " starts with a sun letter: the ل is silent (shadda)."
+                  : w.ar + " starts with a moon letter: the ل is pronounced."),
         };
       },
     },
@@ -161,11 +177,17 @@
       lessons: ["g2"],
       make: function () {
         const w = rand(NOUNS);
+        const article = w.g === "f" ? "une " : "un ";
         return {
-          q: "Pour dire « ceci est " + (w.g === "f" ? "une " : "un ") + w.fr + " », en arabe on…",
-          options: ["accole les deux mots (pas de verbe « être »)", "utilise le verbe « être »"],
+          q: L("Pour dire « ceci est " + article + w.fr + " », en arabe on…",
+               "To say 'this is a " + w.en + "', in Arabic you…"),
+          options: [L("accole les deux mots (pas de verbe « être »)",
+                      "just put the two words side by side (no verb 'to be')"),
+                    L("utilise le verbe « être »",
+                      "use the verb 'to be'")],
           answer: 0,
-          explain: "La phrase nominale accole مبتدأ + خبر : هٰذَا " + w.ar + "ٌ.",
+          explain: L("La phrase nominale accole مبتدأ + خبر : هٰذَا " + w.ar + "ٌ.",
+                     "The nominal sentence joins mubtadaʾ + khabar: هٰذَا " + w.ar + "ٌ."),
         };
       },
     },
@@ -174,13 +196,19 @@
       lessons: ["g2"],
       make: function () {
         const w = rand(NOUNS);
+        const explFr = endsTaa(w)
+          ? "Se termine par ة → féminin → هٰذِهِ."
+          : (w.g === "f" ? "Féminin (à connaître) → هٰذِهِ." : "Masculin → هٰذَا.");
+        const explEn = endsTaa(w)
+          ? "Ends in ة → feminine → هٰذِهِ."
+          : (w.g === "f" ? "Feminine (to memorise) → هٰذِهِ." : "Masculine → هٰذَا.");
         return {
-          q: "Quel démonstratif pour " + w.ar + " (" + w.fr + ") ?",
-          options: ["هٰذَا (masculin)", "هٰذِهِ (féminin)"],
+          q: L("Quel démonstratif pour " + w.ar + " (" + w.fr + ") ?",
+               "Which demonstrative for " + w.ar + " (" + w.en + ")?"),
+          options: [L("هٰذَا (masculin)", "هٰذَا (masculine)"),
+                    L("هٰذِهِ (féminin)", "هٰذِهِ (feminine)")],
           answer: w.g === "f" ? 1 : 0,
-          explain: endsTaa(w)
-            ? "Se termine par ة → féminin → هٰذِهِ."
-            : (w.g === "f" ? "Féminin (à connaître) → هٰذِهِ." : "Masculin → هٰذَا."),
+          explain: L(explFr, explEn),
         };
       },
     },
@@ -190,10 +218,14 @@
       make: function () {
         const a = rand(NOUNS);
         return {
-          q: "Dans une إضافة (ex. « le " + a.fr + " de … »), le 1er mot (مُضَاف)…",
-          options: ["ne prend ni الـ ni tanwin", "prend toujours الـ", "porte un tanwin"],
+          q: L("Dans une إضافة (ex. « le " + a.fr + " de … »), le 1er mot (مُضَاف)…",
+               "In an iḍāfa (e.g. 'the " + a.en + " of …'), the 1st word (muḍāf)…"),
+          options: [L("ne prend ni الـ ni tanwin", "takes neither الـ nor tanwīn"),
+                    L("prend toujours الـ",       "always takes الـ"),
+                    L("porte un tanwin",           "carries a tanwīn")],
           answer: 0,
-          explain: "Le مُضَاف reste nu ; c'est le 2e mot qui est au génitif (kasra).",
+          explain: L("Le مُضَاف reste nu ; c'est le 2e mot qui est au génitif (kasra).",
+                     "The muḍāf stays bare; it's the 2nd word that carries the genitive (kasra)."),
         };
       },
     },
@@ -202,14 +234,21 @@
       lessons: ["g3"],
       make: function () {
         const w = rand(NOUNS);
+        const explFr = endsTaa(w)
+          ? "La ة marque le féminin."
+          : (w.g === "f" ? "Féminin sans marqueur — à mémoriser (fréquent dans le Coran)."
+                         : "Pas de marqueur → masculin.");
+        const explEn = endsTaa(w)
+          ? "The ة marks the feminine."
+          : (w.g === "f" ? "Feminine with no marker — memorise it (frequent in the Qur'ān)."
+                         : "No marker → masculine.");
         return {
-          q: w.ar + " (" + w.fr + ") est…",
-          options: ["masculin", "féminin"],
+          q: L(w.ar + " (" + w.fr + ") est…",
+               w.ar + " (" + w.en + ") is…"),
+          options: [L("masculin", "masculine"),
+                    L("féminin",  "feminine")],
           answer: w.g === "f" ? 1 : 0,
-          explain: endsTaa(w)
-            ? "La ة marque le féminin."
-            : (w.g === "f" ? "Féminin sans marqueur — à mémoriser (fréquent dans le Coran)."
-                           : "Pas de marqueur → masculin."),
+          explain: L(explFr, explEn),
         };
       },
     },
@@ -219,10 +258,14 @@
       make: function () {
         const p = rand(PARTICLES.filter(x => ["فِي", "مِنْ", "إِلَى", "عَلَى"].indexOf(x.ar) !== -1));
         return {
-          q: "Après la préposition " + p.ar + " (" + p.fr + "), le nom est au cas…",
-          options: ["جَرّ (kasra)", "رَفْع (damma)", "نَصْب (fatha)"],
+          q: L("Après la préposition " + p.ar + " (" + p.fr + "), le nom est au cas…",
+               "After the preposition " + p.ar + " (" + p.en + "), the noun is in the case…"),
+          options: [L("جَرّ (kasra)",  "jarr (kasra)"),
+                    L("رَفْع (damma)", "rafʿ (ḍamma)"),
+                    L("نَصْب (fatha)", "naṣb (fatḥa)")],
           answer: 0,
-          explain: "Après une préposition → génitif (جَرّ), marqué par la kasra.",
+          explain: L("Après une préposition → génitif (جَرّ), marqué par la kasra.",
+                     "After a preposition → genitive (jarr), marked by the kasra."),
         };
       },
     },
@@ -232,10 +275,12 @@
       make: function () {
         const w = rand(PLURAL_M);
         return {
-          q: "Le pluriel masculin sain de " + w.ar + " (" + w.fr + "), au cas sujet, se termine par…",
-          options: ["ـُونَ", "ـِينَ", "ـَات"],
+          q: L("Le pluriel masculin sain de " + w.ar + " (" + w.fr + "), au cas sujet, se termine par…",
+               "The sound masculine plural of " + w.ar + " (" + w.en + "), in the subject case, ends with…"),
+          options: [L("ـُونَ", "ـُونَ"), L("ـِينَ", "ـِينَ"), L("ـَات", "ـَات")],
           answer: 0,
-          explain: "Masculin sain, cas sujet : ـُونَ (et ـِينَ dans les autres cas).",
+          explain: L("Masculin sain, cas sujet : ـُونَ (et ـِينَ dans les autres cas).",
+                     "Sound masculine, subject case: ـُونَ (and ـِينَ in the other cases)."),
         };
       },
     },
@@ -243,25 +288,30 @@
     plural_of: {
       lessons: ["g3"],
       make: function () {
-        // Tous les noms du pool ont maintenant un `pl` vérifié + son type.
         const w = rand(NOUNS.filter(function (x) { return x.pl; }));
         const sf = soundFPlural(w);
         const sm = soundMPlural(w);
-        // Options : le pluriel réel + les deux distracteurs « rule-based ».
-        // Dédupliquer pour éviter deux options identiques (mot sain-féminin).
-        const opts = [w.pl];
-        if (sf !== w.pl) opts.push(sf);
-        if (sm !== w.pl && sm !== sf) opts.push(sm);
+        const opts = [L(w.pl, w.pl)];
+        if (sf !== w.pl) opts.push(L(sf, sf));
+        if (sm !== w.pl && sm !== sf) opts.push(L(sm, sm));
         const isBroken = w.plType === "broken";
         return {
-          q: "Quel est le pluriel de " + w.ar + " (" + w.fr + ") ?",
+          q: L("Quel est le pluriel de " + w.ar + " (" + w.fr + ") ?",
+               "What is the plural of " + w.ar + " (" + w.en + ")?"),
           options: opts,
           answer: 0,
-          explain: isBroken
-            ? w.ar + " a un pluriel BRISÉ (جمع تكسير) : " + w.pl +
-              " — à mémoriser. La règle sain-féminin donnerait " + sf +
-              ", mais elle ne s'applique pas ici."
-            : w.ar + " suit la règle sain-féminin : retire ة, ajoute ات → " + w.pl + ".",
+          explain: L(
+            isBroken
+              ? w.ar + " a un pluriel BRISÉ (جمع تكسير) : " + w.pl +
+                " — à mémoriser. La règle sain-féminin donnerait " + sf +
+                ", mais elle ne s'applique pas ici."
+              : w.ar + " suit la règle sain-féminin : retire ة, ajoute ات → " + w.pl + ".",
+            isBroken
+              ? w.ar + " has a BROKEN plural (جمع تكسير): " + w.pl +
+                " — memorise it. The sound-feminine rule would give " + sf +
+                ", but it doesn't apply here."
+              : w.ar + " follows the sound-feminine rule: drop ة, add ات → " + w.pl + "."
+          ),
         };
       },
     },
@@ -271,10 +321,14 @@
       make: function () {
         const w = rand(NOUNS.filter(x => !endsTaa(x)));
         return {
-          q: "Comment dire « mon " + w.fr + " » ?",
-          options: [w.ar + "ِي", w.ar + "ُكَ", w.ar + "ُهُ"],
+          q: L("Comment dire « mon " + w.fr + " » ?",
+               "How do you say 'my " + w.en + "'?"),
+          options: [L(w.ar + "ِي", w.ar + "ِي"),
+                    L(w.ar + "ُكَ", w.ar + "ُكَ"),
+                    L(w.ar + "ُهُ", w.ar + "ُهُ")],
           answer: 0,
-          explain: "Le suffixe ـِي signifie « mon » (كَ = ton, هُ = son).",
+          explain: L("Le suffixe ـِي signifie « mon » (كَ = ton, هُ = son).",
+                     "The suffix ـِي means 'my' (كَ = your, هُ = his)."),
         };
       },
     },
@@ -284,10 +338,13 @@
       make: function () {
         const w = rand(NOUNS);
         return {
-          q: "Où se place l'adjectif qui qualifie " + w.ar + " (" + w.fr + ") ?",
-          options: ["après le nom", "avant le nom"],
+          q: L("Où se place l'adjectif qui qualifie " + w.ar + " (" + w.fr + ") ?",
+               "Where does the adjective describing " + w.ar + " (" + w.en + ") go?"),
+          options: [L("après le nom", "after the noun"),
+                    L("avant le nom", "before the noun")],
           answer: 0,
-          explain: "L'adjectif (النَّعْت) suit toujours le nom qu'il qualifie.",
+          explain: L("L'adjectif (النَّعْت) suit toujours le nom qu'il qualifie.",
+                     "The adjective (an-naʿt) always follows the noun it describes."),
         };
       },
     },
@@ -297,10 +354,14 @@
       make: function () {
         const w = rand(NOUNS);
         return {
-          q: "Pour accorder un adjectif à " + w.ar + " (" + w.fr + "), sur combien de points s'accorde-t-il ?",
-          options: ["4 : genre, nombre, définition, cas", "1 : le genre", "2 : genre et nombre"],
+          q: L("Pour accorder un adjectif à " + w.ar + " (" + w.fr + "), sur combien de points s'accorde-t-il ?",
+               "To agree an adjective with " + w.ar + " (" + w.en + "), how many points must it match?"),
+          options: [L("4 : genre, nombre, définition, cas", "4: gender, number, definiteness, case"),
+                    L("1 : le genre",                       "1: gender"),
+                    L("2 : genre et nombre",                "2: gender and number")],
           answer: 0,
-          explain: "Genre, nombre, définition (نكرة/معرفة) ET cas — les quatre à la fois.",
+          explain: L("Genre, nombre, définition (نكرة/معرفة) ET cas — les quatre à la fois.",
+                     "Gender, number, definiteness (نكرة/معرفة) AND case — all four at once."),
         };
       },
     },
@@ -310,10 +371,13 @@
       make: function () {
         const w = rand(NONHUMAN);
         return {
-          q: "Pour qualifier " + w.pl + " (" + w.fr + ", un pluriel de choses), l'adjectif est…",
-          options: ["féminin singulier", "masculin pluriel"],
+          q: L("Pour qualifier " + w.pl + " (" + w.fr + ", un pluriel de choses), l'adjectif est…",
+               "To describe " + w.pl + " (" + w.en + ", a plural of things), the adjective is…"),
+          options: [L("féminin singulier", "feminine singular"),
+                    L("masculin pluriel",  "masculine plural")],
           answer: 0,
-          explain: "Règle du non-humain : l'adjectif se met au féminin singulier — " + w.pl + " جَدِيدَة.",
+          explain: L("Règle du non-humain : l'adjectif se met au féminin singulier — " + w.pl + " جَدِيدَة.",
+                     "Non-human rule: the adjective takes feminine singular — " + w.pl + " جَدِيدَة."),
         };
       },
     },
@@ -321,15 +385,11 @@
 
   // =========================================================================
   //  MOTEUR — construit un quiz exhaustif puis varié
-  //  1) une question par gabarit (couverture complète du concept)
-  //  2) on complète jusqu'à n avec des tirages frais (jamais deux fois la
-  //     même question exacte)
   // =========================================================================
   function build(templates, n) {
     templates = templates.filter(Boolean);
     const T = templates.length;
     if (!T) return [];
-    // quota : au mieux ⌊n/T⌋+1 questions d'un même gabarit (ex. 10 q, 4 gabarits → 3)
     const quota = Math.floor(n / T) + 1;
 
     const out = [];
@@ -342,18 +402,19 @@
     function tryAdd(t, tries) {
       for (let k = 0; k < tries; k++) {
         const q = t.make();
-        if (q && !seen[q.q]) {
-          seen[q.q] = 1; count.set(t, count.get(t) + 1); out.push(q); return true;
+        // on déduplique sur la version FR pour rester stable inter-langues
+        const key = q && (typeof q.q === "string" ? q.q : q.q.fr);
+        if (q && !seen[key]) {
+          seen[key] = 1; count.set(t, count.get(t) + 1); out.push(q); return true;
         }
       }
       return false;
     }
 
-    // 1) couverture : un de chaque gabarit, dans un ordre aléatoire
+    // 1) couverture : un de chaque gabarit
     shuffle(templates).forEach(function (t) { if (out.length < n) tryAdd(t, 6); });
 
-    // 2) remplissage DISPERSÉ : tirage aléatoire parmi les gabarits encore
-    //    sous le quota — la distribution varie à chaque quiz
+    // 2) remplissage dispersé sous le quota
     let guard = 0;
     while (out.length < n && guard < 800) {
       guard++;
@@ -362,11 +423,10 @@
       });
       if (!eligible.length) break;
       const t = rand(eligible);
-      if (!tryAdd(t, 8)) exhausted.add(t);   // plus de question inédite pour ce gabarit
+      if (!tryAdd(t, 8)) exhausted.add(t);
     }
 
-    // 3) filet de sécurité : si trop peu de variété pour atteindre n sous le
-    //    quota, on complète en relâchant le quota (rare — mieux vaut n questions)
+    // 3) filet : relâcher le quota si nécessaire
     guard = 0;
     while (out.length < n && guard < 800) {
       guard++;
@@ -387,8 +447,15 @@
   }
 
   // ---- quiz de vocabulaire ----------------------------------------------
+  //   w.fr est maintenant {fr, en} (voir vocab.js). On lit les deux langues
+  //   pour construire des questions bilingues.
   function vocabDeck(id) {
     return (window.VOCAB || []).filter(d => d.id === id)[0];
+  }
+  function gloss(w, lang) {
+    if (!w || w.fr == null) return "";
+    if (typeof w.fr === "string") return w.fr;      // rétrocompat
+    return w.fr[lang] || w.fr.fr || w.fr.en || "";
   }
   function buildVocabQuiz(deckId, n) {
     const deck = vocabDeck(deckId);
@@ -397,23 +464,30 @@
     const picks = words.length <= n ? shuffle(words) : sample(words, n);
     return picks.map(function (w, i) {
       const others = words.filter(x => x.ar !== w.ar);
+      const gFr = gloss(w, "fr"), gEn = gloss(w, "en");
       if (i % 2 === 0) {
         // sens : que signifie {ar} ({tr}) ?
-        const distract = sample(others, 3).map(x => x.fr);
+        const distract = sample(others, 3);
         return {
-          q: "Que signifie " + w.ar + " (" + w.tr + ") ?",
-          options: [w.fr].concat(distract),
+          q: L("Que signifie " + w.ar + " (" + w.tr + ") ?",
+               "What does " + w.ar + " (" + w.tr + ") mean?"),
+          options: [L(gFr, gEn)].concat(
+            distract.map(x => L(gloss(x, "fr"), gloss(x, "en")))
+          ),
           answer: 0,
-          explain: w.ar + " — " + w.tr + " = " + w.fr + ".",
+          explain: L(w.ar + " — " + w.tr + " = " + gFr + ".",
+                     w.ar + " — " + w.tr + " = " + gEn + "."),
         };
       } else {
         // reconnaissance : quel mot signifie « {fr} » ?
-        const distract = sample(others, 3).map(x => x.ar);
+        const distract = sample(others, 3);
         return {
-          q: "Quel mot signifie « " + w.fr + " » ?",
-          options: [w.ar].concat(distract),
+          q: L("Quel mot signifie « " + gFr + " » ?",
+               "Which word means '" + gEn + "'?"),
+          options: [L(w.ar, w.ar)].concat(distract.map(x => L(x.ar, x.ar))),
           answer: 0,
-          explain: w.fr + " = " + w.ar + " (" + w.tr + ").",
+          explain: L(gFr + " = " + w.ar + " (" + w.tr + ").",
+                     gEn + " = " + w.ar + " (" + w.tr + ")."),
         };
       }
     });
